@@ -1,22 +1,22 @@
 # Chromox Voice Training Status
 
-> Last updated: 2026-02-20 15:01 UTC
+> Last updated: 2026-02-20 15:06 UTC
 
 ## So-VITS-SVC 4.1 Training
 
-**Status:** TRAINING IN BACKGROUND (PID check: `ps aux | grep train.py`)
-**Resume from crash:** `cd ~/chromox/backend/so_vits_svc && .venv/bin/python train.py -c configs/config.json -m 44k`
+**Status:** PAUSED at epoch ~1338 (stopped 2026-02-20 15:06 UTC)
+**Resume:** `cd ~/chromox/backend/so_vits_svc && nohup .venv/bin/python train.py -c configs/config.json -m 44k > /tmp/sovits_train.log 2>&1 &`
 
 | Field | Value |
 |-------|-------|
-| Current epoch | ~1350 (as of 15:01 UTC) |
+| Current epoch | ~1338 (paused) |
 | Target epochs | 20,000 |
 | Last good checkpoint | G_4000.pth (epoch 1334) |
 | Next checkpoint | G_4800.pth (epoch ~1600, saves every 800) |
-| Epoch speed | ~11s/epoch |
-| ETA to 20k | ~57 hours from epoch 1350 |
+| Epoch speed | ~17s/epoch (batch=3, quiet mode) |
+| ETA to 20k | ~88 hours from epoch 1338 (batch=3) |
 | GPU | RTX 4090 Laptop (16GB VRAM) |
-| Batch size | 6 |
+| Batch size | 3 (reduced from 6 for quieter fans) |
 | Learning rate | 0.0001 (decay 0.999875) |
 | Speech encoder | vec768l12 (ContentVec 768-dim) |
 | F0 predictor | RMVPE |
