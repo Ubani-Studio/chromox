@@ -31,7 +31,7 @@ const defaultControls: StyleControls = {
 };
 
 const defaultEffects: EffectSettings = {
-  engine: 'rave-ddsp-8d',
+  engine: 'clean',
   preset: 'clean',
   clarity: 0.7,
   air: 0.4,
@@ -82,6 +82,7 @@ type Props = {
     guideTempo?: number;
     guide?: File;
     folioClipId?: string;
+    providerOverride?: string;
   }) => Promise<{ audioUrl: string; render: RenderHistoryItem }>;
   onRenderComplete: (render: RenderHistoryItem) => void;
   prefill?: RenderHistoryItem | null;
@@ -152,6 +153,8 @@ export function StudioPanel({
   const [ratingBusy, setRatingBusy] = useState(false);
   const [tasteProfile, setTasteProfile] = useState<TasteProfile | null>(null);
   const [tasteLoading, setTasteLoading] = useState(false);
+  const [renderError, setRenderError] = useState<string>('');
+  const [selectedProvider, setSelectedProvider] = useState('rvc');
   const [customMintMode, setCustomMintMode] = useState<'glitch' | 'dream' | 'anthem'>('glitch');
   const [mintDuration, setMintDuration] = useState<number>(12);
   const [voiceControlsOpen, setVoiceControlsOpen] = useState(false);
@@ -255,6 +258,7 @@ export function StudioPanel({
     return async () => {
       if (!activePersonaId) return;
       setBusy(true);
+      setRenderError('');
       try {
         const result = await onRender({
           personaId: activePersonaId,
@@ -286,6 +290,10 @@ export function StudioPanel({
         setActiveAbSlot(slot);
         onRenderComplete(result.render);
         setLatestRender(result.render);
+      } catch (err: any) {
+        const message = err?.response?.data?.error || err?.message || 'Render failed — unknown error';
+        console.error('[StudioPanel] A/B Render failed:', message);
+        setRenderError(message);
       } finally {
         setBusy(false);
       }
@@ -312,6 +320,7 @@ export function StudioPanel({
   async function handleRender() {
     if (!activePersonaId) return;
     setBusy(true);
+    setRenderError('');
     try {
       const result = await onRender({
         personaId: activePersonaId,
@@ -327,7 +336,8 @@ export function StudioPanel({
         guideUseLyrics,
         guideTempo,
         guide,
-              });
+        providerOverride: selectedProvider,
+      });
       setOutputUrl(result.audioUrl);
       onRenderComplete(result.render);
       setLatestRender(result.render);
@@ -336,6 +346,10 @@ export function StudioPanel({
         effectPreset: effects.preset,
         guideSampleId: selectedGuideSampleId
       });
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || 'Render failed — unknown error';
+      console.error('[StudioPanel] Render failed:', message);
+      setRenderError(message);
     } finally {
       setBusy(false);
     }
@@ -344,6 +358,7 @@ export function StudioPanel({
   async function handlePreview() {
     if (!activePersonaId) return;
     setPreviewBusy(true);
+    setRenderError('');
     try {
       const result = await onPreview({
         personaId: activePersonaId,
@@ -366,6 +381,10 @@ export function StudioPanel({
         effectPreset: effects.preset,
         guideSampleId: selectedGuideSampleId
       });
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || 'Preview failed — unknown error';
+      console.error('[StudioPanel] Preview failed:', message);
+      setRenderError(message);
     } finally {
       setPreviewBusy(false);
     }
@@ -991,16 +1010,12 @@ export function StudioPanel({
                       setEffects((prev) => ({ ...prev, preset: e.target.value as EffectSettings['preset'] }))
                     }
                   >
-                    <option value="clean">Clean Studio</option>
-                    <option value="lush">Lush (De-essed + Spatial)</option>
+                    <option value="clean">Clean</option>
+                    <option value="lush">Lush</option>
                     <option value="vintage">Vintage Warmth</option>
-                    <option value="club">Club Stack</option>
                     <option value="raw">Raw Direct</option>
-                    <option value="shimmer-stack">Shimmer Stack</option>
-                    <option value="harmonic-orbit">Harmonic Orbit 8D</option>
-                    <option value="pitch-warp">Pitch Warp Chorus</option>
+                    <option value="harmonic-orbit">Harmonic Orbit</option>
                     <option value="choir-cloud">Choir Cloud</option>
-                    <option value="8d-swarm">8D Swarm</option>
                   </select>
                 </div>
                 <label className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-secondary">
@@ -1037,6 +1052,16 @@ export function StudioPanel({
                   </div>
                 ))}
               </div>
+              <div className="mb-4">
+                <p className="mb-1 text-[11px] uppercase tracking-wider text-muted">Voice Provider</p>
+                <select
+                  className="w-full rounded-lg border border-border-default bg-canvas px-3 py-2 text-sm text-primary focus:border-accent focus:outline-none"
+                  value={selectedProvider}
+                  onChange={(e) => setSelectedProvider(e.target.value)}
+                >
+                  <option value="rvc">Studio Clone (RVC)</option>
+                </select>
+              </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <p className="mb-1 text-[11px] uppercase tracking-wider text-muted">Engine</p>
@@ -1047,13 +1072,9 @@ export function StudioPanel({
                       setEffects((prev) => ({ ...prev, engine: e.target.value as EffectSettings['engine'] }))
                     }
                   >
-                    <option value="rave-ddsp-8d">RAVE + DDSP + 8D Orbit</option>
+                    <option value="clean">Clean Vocal</option>
                     <option value="rave-ddsp">RAVE + DDSP</option>
-                    <option value="resonance-8d">Resonance 8D Spatializer</option>
-                    <option value="chromox-labs">Chromox Labs DSP</option>
-                    <option value="izotope-nectar">iZotope Nectar</option>
-                    <option value="waves-clarity">Waves Clarity Vx</option>
-                    <option value="antelope-synergy">Antelope Synergy Core</option>
+                    <option value="rave-ddsp-8d">RAVE + DDSP + 8D Orbit</option>
                   </select>
                 </div>
                 <div>
@@ -1072,7 +1093,7 @@ export function StudioPanel({
                   </select>
                 </div>
               </div>
-              {(effects.engine.includes('8d') || effects.engine === 'resonance-8d') && (
+              {effects.engine.includes('8d') && (
                 <div className="grid gap-4 md:grid-cols-3">
                   {orbitSliderConfig.map(({ key, label: orbitLabel, defaultValue }) => (
                     <div key={key}>
@@ -1255,50 +1276,80 @@ export function StudioPanel({
           </div>
         )}
 
-        {/* Normal Output (non-A/B mode) */}
-        {!abMode && (previewUrl || outputUrl) && (
-          <div className="mt-4 grid gap-3 lg:grid-cols-2">
-            {previewUrl && studioMode === 'advanced' && (
-              <div className="rounded-2xl border border-border-default bg-canvas p-3">
-                <AudioPlayer src={previewUrl} label="Preview" />
+        {/* Render Output (non-A/B mode) — always visible */}
+        {!abMode && (
+          <div className="mt-4 space-y-3">
+            {/* Error display */}
+            {renderError && (
+              <div className="rounded-2xl border border-red-500/30 bg-red-500/5 p-4">
+                <p className="text-sm font-medium text-red-400">Render failed</p>
+                <p className="mt-1 text-xs text-red-400/80">{renderError}</p>
+                <p className="mt-2 text-[10px] text-muted">
+                  Check that at least one voice provider has a valid API key configured, or upload a guide vocal for local ffmpeg fallback.
+                </p>
               </div>
             )}
-            {outputUrl && (
-              <div className={`rounded-2xl border border-border-default bg-canvas p-3 ${studioMode === 'simple' ? 'lg:col-span-2' : ''}`}>
-                <AudioPlayer src={outputUrl} label="Render" />
-                {latestRender && (
-                  <div className="mt-3 flex flex-col gap-2 text-[11px] uppercase tracking-wide text-muted">
-                    <span>Rate this print</span>
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleRateLatest('like')}
-                        disabled={ratingBusy}
-                        className={`flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-medium ${
-                          latestRender.rating === 'like'
-                            ? 'bg-accent/15 text-accent border border-accent/40'
-                            : 'border border-border-default text-secondary hover:border-border-emphasis'
-                        } disabled:opacity-40`}
-                      >
-                        <ThumbUpIcon size={12} /> Like
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleRateLatest('dislike')}
-                        disabled={ratingBusy}
-                        className={`flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-medium ${
-                          latestRender.rating === 'dislike'
-                            ? 'bg-error/15 text-error border border-error/40'
-                            : 'border border-border-default text-secondary hover:border-border-emphasis'
-                        } disabled:opacity-40`}
-                      >
-                        <ThumbDownIcon size={12} /> Pass
-                      </button>
+
+            <div className="grid gap-3 lg:grid-cols-2">
+              {previewUrl && studioMode === 'advanced' && (
+                <div className="rounded-2xl border border-border-default bg-canvas p-3">
+                  <AudioPlayer src={previewUrl} label="Preview" />
+                </div>
+              )}
+              {outputUrl ? (
+                <div className={`rounded-2xl border border-border-default bg-canvas p-3 ${studioMode === 'simple' || !previewUrl ? 'lg:col-span-2' : ''}`}>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <AudioPlayer src={outputUrl} label="Render" />
                     </div>
+                    <a
+                      href={outputUrl}
+                      download
+                      className="shrink-0 rounded-lg border border-border-default px-3 py-2 text-[10px] font-medium uppercase tracking-wide text-secondary transition hover:border-border-emphasis hover:text-primary"
+                    >
+                      Download
+                    </a>
                   </div>
-                )}
-              </div>
-            )}
+                  {latestRender && (
+                    <div className="mt-3 flex flex-col gap-2 text-[11px] uppercase tracking-wide text-muted">
+                      <span>Rate this print</span>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleRateLatest('like')}
+                          disabled={ratingBusy}
+                          className={`flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-medium ${
+                            latestRender.rating === 'like'
+                              ? 'bg-accent/15 text-accent border border-accent/40'
+                              : 'border border-border-default text-secondary hover:border-border-emphasis'
+                          } disabled:opacity-40`}
+                        >
+                          <ThumbUpIcon size={12} /> Like
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRateLatest('dislike')}
+                          disabled={ratingBusy}
+                          className={`flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-medium ${
+                            latestRender.rating === 'dislike'
+                              ? 'bg-error/15 text-error border border-error/40'
+                              : 'border border-border-default text-secondary hover:border-border-emphasis'
+                          } disabled:opacity-40`}
+                        >
+                          <ThumbDownIcon size={12} /> Pass
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : !renderError && !busy && (
+                <div className={`rounded-2xl border border-dashed border-border-default bg-canvas/50 p-6 ${studioMode === 'simple' || !previewUrl ? 'lg:col-span-2' : ''}`}>
+                  <p className="text-center text-sm text-muted">
+                    Waiting for render output...
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

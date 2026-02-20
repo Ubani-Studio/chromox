@@ -64,12 +64,14 @@ export async function promptToControls(stylePrompt: string) {
     brightness: normalize(5),
     breathiness: normalize(11),
     energy: normalize(19),
-    formant: normalize(23) * 2 - 1,
-    vibratoDepth: normalize(31),
-    vibratoRate: normalize(37),
-    roboticism: normalize(41),
-    glitch: normalize(43),
-    stereoWidth: normalize(47)
+    stereoWidth: normalize(47),
+    // Safe defaults — these controls cause destructive artifacts (shaky pitch,
+    // unwanted formant shifts, glitch noise) when set to random values
+    formant: 0,
+    vibratoDepth: 0,
+    vibratoRate: 0.5,
+    roboticism: 0,
+    glitch: 0
   };
 }
 

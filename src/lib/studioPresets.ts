@@ -131,7 +131,7 @@ export const studioPresets: StudioPreset[] = [
       stereoWidth: 0.6
     },
     effects: {
-      preset: 'club',
+      preset: 'raw',
       clarity: 0.85,
       air: 0.25,
       drive: 0.45,
@@ -210,7 +210,7 @@ export const studioPresets: StudioPreset[] = [
       stereoWidth: 0.9
     },
     effects: {
-      preset: 'pitch-warp',
+      preset: 'raw',
       engine: 'rave-ddsp-8d',
       clarity: 0.7,
       air: 0.35,

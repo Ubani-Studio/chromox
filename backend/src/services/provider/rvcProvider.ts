@@ -2,33 +2,28 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
-import { ProviderRequest, ProviderResponse, SingingProvider } from './base';
-import { loadVoiceProfile } from '../voiceAnalysis';
+import { ProviderRequest, ProviderResponse, SingingProvider } from './base.js';
+import { loadVoiceProfile } from '../voiceAnalysis.js';
+import { ElevenLabsProviderEnhanced } from './elevenLabsProviderEnhanced.js';
 
 const execAsync = promisify(exec);
 
+const RVC_SERVICE_URL = process.env.RVC_SERVICE_URL || 'http://localhost:5012';
+
 /**
  * RVC (Retrieval-based Voice Conversion) Provider
- * Uses the RVC model for high-quality voice cloning and conversion.
  *
- * Requirements:
- * - RVC Python environment installed
- * - Voice model trained from the cloned voice sample
- *
- * This provider offers the highest quality voice cloning with full
- * control over pitch, timbre, and vocal characteristics.
+ * Calls the local RVC FastAPI service at localhost:5012 for real voice conversion.
+ * Falls back to ElevenLabs Enhanced when the RVC service is unavailable.
  */
 export class RVCProvider implements SingingProvider {
   id = 'rvc';
   label = 'RVC Voice Clone';
 
-  private rvcPath: string;
-  private modelsPath: string;
+  private fallbackProvider: ElevenLabsProviderEnhanced;
 
   constructor() {
-    this.rvcPath = process.env.RVC_PATH || '/opt/RVC';
-    this.modelsPath = path.join(process.cwd(), 'rvc_models');
-    fs.mkdirSync(this.modelsPath, { recursive: true });
+    this.fallbackProvider = new ElevenLabsProviderEnhanced();
   }
 
   async synthesize(request: ProviderRequest): Promise<ProviderResponse> {
@@ -43,30 +38,31 @@ export class RVCProvider implements SingingProvider {
       throw new Error(`Voice profile not found for model: ${request.voiceModel}`);
     }
 
-    // Check if RVC is available
-    if (!this.isRVCAvailable()) {
-      console.warn('[RVC] RVC not available, using mock synthesis');
-      return this.mockSynthesize(request, voiceProfile);
+    // Check if RVC service is running
+    const available = await this.isRVCAvailable();
+    if (!available) {
+      console.warn('[RVC] RVC service not available, falling back to ElevenLabs Enhanced');
+      return this.fallbackSynthesize(request);
     }
 
     try {
-      // Step 1: Generate base vocals using TTS or existing guide
+      // Step 1: Get base vocals (guide vocal or TTS)
       const baseVocalPath = request.guidePath || (await this.generateBaseTTS(request.lyrics));
 
-      // Step 2: Apply RVC voice conversion
-      const convertedPath = await this.applyRVCConversion(baseVocalPath, voiceProfile);
+      // Step 2: Clean spectral envelope transfer — no vocoder, no neural artifacts
+      console.log('[RVC] Using clean STFT spectral transfer (no vocoder)');
+      const convertedBuffer = await this.applyCleanConversion(baseVocalPath, voiceProfile, request);
 
-      // Step 3: Apply style controls (pitch shift, formant, effects)
-      const finalPath = await this.applyStyleControls(convertedPath, request.controls);
+      // Step 3: Apply post-processing style controls
+      const finalBuffer = await this.applyStyleControls(convertedBuffer, request.controls);
 
-      // Read the final audio file
-      const audioBuffer = fs.readFileSync(finalPath);
-
-      // Cleanup temporary files
-      this.cleanup(baseVocalPath, convertedPath, finalPath);
+      // Cleanup temp TTS file if we created one
+      if (!request.guidePath && baseVocalPath.includes('temp')) {
+        try { fs.unlinkSync(baseVocalPath); } catch {}
+      }
 
       return {
-        audioBuffer,
+        audioBuffer: finalBuffer,
         format: 'wav'
       };
     } catch (error) {
@@ -76,125 +72,130 @@ export class RVCProvider implements SingingProvider {
   }
 
   /**
-   * Checks if RVC is available on the system
+   * Check if the RVC service is running by hitting /health.
    */
-  private isRVCAvailable(): boolean {
-    return fs.existsSync(this.rvcPath);
+  async isRVCAvailable(): Promise<boolean> {
+    try {
+      const resp = await fetch(`${RVC_SERVICE_URL}/health`, { signal: AbortSignal.timeout(3000) });
+      if (!resp.ok) return false;
+      const data = await resp.json() as any;
+      return data.status === 'ok' && data.hubert_loaded === true;
+    } catch {
+      return false;
+    }
+  }
+
+
+  /**
+   * Clean spectral envelope transfer — no vocoder involved.
+   * Warps the guide's spectral envelope toward the persona's in STFT domain,
+   * keeping original phases intact. Zero resynthesis artifacts.
+   */
+  private async applyCleanConversion(
+    inputPath: string,
+    voiceProfile: any,
+    request: ProviderRequest
+  ): Promise<Buffer> {
+    const audioBytes = fs.readFileSync(inputPath);
+    const blob = new Blob([audioBytes], { type: 'audio/wav' });
+
+    const personaWavPath = voiceProfile.samplePath;
+    if (!personaWavPath) {
+      throw new Error('Voice profile has no samplePath for spectral transfer');
+    }
+
+    const formData = new FormData();
+    formData.append('audio', blob, 'input.wav');
+    formData.append('persona_wav', personaWavPath);
+    formData.append('timbre_blend', '0.85');
+    formData.append('pitch_shift', String(request.controls?.formant ? Math.round(request.controls.formant * 12) : 0));
+
+    const resp = await fetch(`${RVC_SERVICE_URL}/convert_world`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!resp.ok) {
+      const text = await resp.text();
+      throw new Error(`Clean spectral transfer failed: ${resp.status} ${text}`);
+    }
+
+    const arrayBuffer = await resp.arrayBuffer();
+    return Buffer.from(arrayBuffer);
   }
 
   /**
-   * Generates base vocals using TTS (espeak, piper, or other TTS engine)
+   * Generate base TTS vocals using espeak + ffmpeg.
    */
   private async generateBaseTTS(lyrics: string): Promise<string> {
     const tempPath = path.join(process.cwd(), 'temp', `tts_${Date.now()}.wav`);
     fs.mkdirSync(path.dirname(tempPath), { recursive: true });
 
-    // Use espeak for basic TTS (can be replaced with better TTS)
-    await execAsync(`espeak "${lyrics}" --stdout | ffmpeg -i pipe:0 "${tempPath}"`);
+    // Sanitize lyrics for shell
+    const sanitized = lyrics.replace(/["`$\\]/g, '');
+    await execAsync(`espeak "${sanitized}" --stdout | ffmpeg -y -i pipe:0 -ar 44100 -ac 1 "${tempPath}"`);
 
     return tempPath;
   }
 
   /**
-   * Applies RVC voice conversion to transform the base vocal into the cloned voice
+   * Apply style controls (pitch shift, vibrato, brightness, etc.) via ffmpeg.
    */
-  private async applyRVCConversion(inputPath: string, voiceProfile: any): Promise<string> {
-    const outputPath = path.join(process.cwd(), 'temp', `rvc_${Date.now()}.wav`);
+  private async applyStyleControls(audioBuffer: Buffer, controls: any): Promise<Buffer> {
+    if (!controls) return audioBuffer;
 
-    // In production, this would call the RVC inference script
-    // python infer.py --input <inputPath> --model <modelPath> --output <outputPath>
-
-    const modelPath = path.join(this.modelsPath, `${voiceProfile.samplePath}.pth`);
-
-    // Check if we have a trained model, otherwise use the reference sample
-    if (!fs.existsSync(modelPath)) {
-      console.log('[RVC] Model not found, using reference sample for quick conversion');
-      // For MVP, just copy the reference sample (in production, would train RVC model)
-      fs.copyFileSync(voiceProfile.samplePath, outputPath);
-      return outputPath;
-    }
-
-    // Execute RVC inference
-    await execAsync(
-      `python "${this.rvcPath}/infer.py" --input "${inputPath}" --model "${modelPath}" --output "${outputPath}" --pitch 0`
-    );
-
-    return outputPath;
-  }
-
-  /**
-   * Applies style controls (effects, pitch shift, formant shift, etc.)
-   */
-  private async applyStyleControls(inputPath: string, controls: any): Promise<string> {
-    const outputPath = path.join(process.cwd(), 'temp', `styled_${Date.now()}.wav`);
-
-    // Build FFmpeg filter chain based on controls
     const filters = [];
-
-    // Pitch shift
-    if (controls.formant !== 0) {
-      const semitones = controls.formant * 12; // ±12 semitones
-      filters.push(`asetrate=44100*${Math.pow(2, semitones / 12)},aresample=44100`);
-    }
 
     // Vibrato
     if (controls.vibratoDepth > 0) {
-      const freq = controls.vibratoRate * 10; // 0-10 Hz
-      const depth = controls.vibratoDepth; // 0-1
-      filters.push(`vibrato=f=${freq}:d=${depth}`);
+      const freq = (controls.vibratoRate || 0.5) * 10;
+      filters.push(`vibrato=f=${freq}:d=${controls.vibratoDepth}`);
     }
 
     // Brightness (EQ)
-    if (controls.brightness !== 0.5) {
-      const gain = (controls.brightness - 0.5) * 12; // ±6dB
+    if (controls.brightness !== undefined && controls.brightness !== 0.5) {
+      const gain = (controls.brightness - 0.5) * 12;
       filters.push(`treble=g=${gain}:f=3000`);
     }
 
-    // Breathiness (add subtle noise)
-    if (controls.breathiness > 0.3) {
-      filters.push(`anoisesrc=a=0.${Math.floor(controls.breathiness * 10)}:d=0`);
+    // Stereo width — skip for mono RVC output (stereotools requires 2ch)
+    // Stereo width is applied later in the effects chain if needed
+
+    if (filters.length === 0) return audioBuffer;
+
+    const inputPath = path.join(process.cwd(), 'temp', `style_in_${Date.now()}.wav`);
+    const outputPath = path.join(process.cwd(), 'temp', `style_out_${Date.now()}.wav`);
+    fs.mkdirSync(path.dirname(inputPath), { recursive: true });
+
+    fs.writeFileSync(inputPath, audioBuffer);
+
+    try {
+      await execAsync(`ffmpeg -y -i "${inputPath}" -af "${filters.join(',')}" "${outputPath}"`);
+      const result = fs.readFileSync(outputPath);
+      return result;
+    } finally {
+      try { fs.unlinkSync(inputPath); } catch {}
+      try { fs.unlinkSync(outputPath); } catch {}
     }
-
-    // Stereo width
-    if (controls.stereoWidth !== 0.5) {
-      const width = controls.stereoWidth * 2; // 0-2
-      filters.push(`stereotools=mwi=${width}`);
-    }
-
-    const filterChain = filters.join(',');
-
-    if (filterChain) {
-      await execAsync(`ffmpeg -i "${inputPath}" -af "${filterChain}" "${outputPath}"`);
-    } else {
-      fs.copyFileSync(inputPath, outputPath);
-    }
-
-    return outputPath;
   }
 
   /**
-   * Mock synthesis for when RVC is not available
+   * Fallback to ElevenLabs Enhanced when RVC service is down.
    */
-  private mockSynthesize(request: ProviderRequest, voiceProfile: any): ProviderResponse {
-    console.log('[RVC] Using mock synthesis (RVC not installed)');
-
-    // Return the reference sample as a placeholder
-    const audioBuffer = fs.readFileSync(voiceProfile.samplePath);
-
-    return {
-      audioBuffer,
-      format: 'wav'
-    };
-  }
-
-  /**
-   * Cleanup temporary files
-   */
-  private cleanup(...paths: string[]) {
-    paths.forEach((p) => {
-      if (fs.existsSync(p) && p.includes('temp')) {
-        fs.unlinkSync(p);
+  private async fallbackSynthesize(request: ProviderRequest): Promise<ProviderResponse> {
+    console.log('[RVC] Delegating to ElevenLabs Enhanced fallback');
+    try {
+      return await this.fallbackProvider.synthesize(request);
+    } catch (error: any) {
+      const msg = error?.message || '';
+      if (msg.includes('401') || msg.includes('403') || msg.includes('quota') ||
+          msg.includes('insufficient') || msg.includes('limit') || msg.includes('payment')) {
+        throw new Error(
+          'ElevenLabs quota exceeded or API key invalid. ' +
+          'Top up your ElevenLabs account at https://elevenlabs.io/subscription or switch to a different provider.'
+        );
       }
-    });
+      throw error;
+    }
   }
 }

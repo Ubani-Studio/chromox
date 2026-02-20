@@ -41,7 +41,32 @@ Thumbs.db
 # Tauri
 src-tauri/target/
 
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# SVC services (large models + venvs, recreatable)
+backend/so_vits_svc/
+backend/ddsp_svc/
+backend/clap_service/
+backend/gptsovits_install/
+backend/gptsovits_service/
+backend/rvc_install/
+backend/rvc_service/
+backend/beat_service/__pycache__/
+
+# Guide samples (user data)
+backend/guide_samples/
+
+# Folio cache
+backend/folio_cache/
+
 # Package manager
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+# Misc generated
+Cargo.lock
+backend/chromox-backend@*

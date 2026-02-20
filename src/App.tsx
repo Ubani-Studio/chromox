@@ -24,11 +24,12 @@ import { DownloadsTab } from './components/DownloadsTab';
 import { EditPersonaModal } from './components/EditPersonaModal';
 import { VoiceTrainingModal } from './components/VoiceTrainingModal';
 import { AudioProvider } from './contexts/AudioContext';
-import { LogoIcon, MicIcon, FolderIcon, ShieldIcon, LibraryIcon } from './components/Icons';
+import { LogoIcon, MicIcon, FolderIcon, ShieldIcon, LibraryIcon, SparklesIcon } from './components/Icons';
 import { BovedaTab } from './components/boveda/BovedaTab';
 import { VoiceLibraryTab } from './components/VoiceLibraryTab';
+import { AdminFlowTab } from './components/AdminFlowTab';
 
-type TabId = 'studio' | 'library' | 'downloads' | 'boveda';
+type TabId = 'studio' | 'library' | 'downloads' | 'boveda' | 'admin';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabId>('studio');
@@ -42,6 +43,12 @@ export default function App() {
   const [trainingPersona, setTrainingPersona] = useState<Persona | null>(null);
   const [tasteProfileVersion, setTasteProfileVersion] = useState(0);
   const [brandName, setBrandName] = useState<'voxa' | 'splurgle'>('voxa');
+  const [adminMode, setAdminMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('chromox_admin') === 'true';
+    }
+    return false;
+  });
 
   function handlePrefillConsumed() {
     setPrefillJob(null);
@@ -50,6 +57,23 @@ export default function App() {
   useEffect(() => {
     refresh();
     refreshDownloads();
+  }, []);
+
+  // Admin mode keyboard shortcut: Ctrl+Shift+A
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        e.preventDefault();
+        setAdminMode(prev => {
+          const newVal = !prev;
+          localStorage.setItem('chromox_admin', String(newVal));
+          console.log(`[Chromox] Admin mode ${newVal ? 'enabled' : 'disabled'}`);
+          return newVal;
+        });
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   async function refresh() {
@@ -175,6 +199,7 @@ export default function App() {
     { id: 'library', label: 'Voice Library', icon: <LibraryIcon size={14} />, count: totalGuideSamples },
     { id: 'downloads', label: 'Downloads', icon: <FolderIcon size={14} />, count: renderHistory.length },
     { id: 'boveda', label: 'Boveda', icon: <ShieldIcon size={14} /> },
+    ...(adminMode ? [{ id: 'admin' as TabId, label: 'Admin', icon: <SparklesIcon size={14} /> }] : []),
   ];
 
   return (
@@ -467,6 +492,14 @@ export default function App() {
               onCreateRelic={async (personaId, relic) => {
                 await createRelic(personaId, relic);
               }}
+            />
+          )}
+
+          {/* Admin Tab (hidden unless admin mode enabled) */}
+          {activeTab === 'admin' && adminMode && (
+            <AdminFlowTab
+              personas={personas}
+              onRenderComplete={handleRenderComplete}
             />
           )}
         </main>

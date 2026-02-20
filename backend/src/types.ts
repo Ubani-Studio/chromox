@@ -19,15 +19,8 @@ export type StyleControls = {
 };
 
 export type EffectSettings = {
-  engine:
-    | 'chromox-labs'
-    | 'izotope-nectar'
-    | 'waves-clarity'
-    | 'antelope-synergy'
-    | 'rave-ddsp'
-    | 'rave-ddsp-8d'
-    | 'resonance-8d';
-  preset?: 'clean' | 'lush' | 'vintage' | 'club' | 'raw' | 'shimmer-stack' | 'harmonic-orbit' | 'pitch-warp' | 'choir-cloud' | '8d-swarm';
+  engine: 'clean' | 'rave-ddsp' | 'rave-ddsp-8d';
+  preset?: 'clean' | 'lush' | 'vintage' | 'raw' | 'harmonic-orbit' | 'choir-cloud';
   clarity: number;
   air: number;
   drive: number;

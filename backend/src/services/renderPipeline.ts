@@ -1,19 +1,30 @@
 import fs from 'fs';
 import path from 'path';
+import { EventEmitter } from 'events';
 import { EffectSettings, RenderPayload, BeatGrid } from '../types.js';
 import { extractPitchAndTiming, extractVocalStem, transcribeLyrics } from './dsp.js';
 import { promptToControls } from './llm.js';
 import { SingingProvider } from './provider/base.js';
+import { synthesizeWithWaterfall } from './provider/providerRegistry.js';
 import { applyAdvancedEffects, defaultEffectSettings } from './effectsProcessor.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
+/** Global render progress emitter. SSE endpoint listens on this. */
+export const renderProgress = new EventEmitter();
+renderProgress.setMaxListeners(20);
+
+function emitProgress(stage: string, percent: number, detail?: string) {
+  renderProgress.emit('progress', { stage, percent, detail, ts: Date.now() });
+}
+
 export class ChromaticCorePipeline {
   constructor(private provider: SingingProvider) {}
 
   async run(payload: RenderPayload) {
+    emitProgress('stem_extract', 5, 'Extracting vocal stem...');
     let guideData = payload.guideFilePath ? await extractVocalStem(payload.guideFilePath) : undefined;
 
     // Trim guide audio if start/end times specified
@@ -21,7 +32,10 @@ export class ChromaticCorePipeline {
       guideData = await trimGuideAudio(guideData.stemPath, payload.guideStartTime, payload.guideEndTime);
     }
 
+    emitProgress('pitch_analysis', 15, 'Analyzing pitch & timing...');
     const pitchData = guideData ? await extractPitchAndTiming(guideData.stemPath) : undefined;
+
+    emitProgress('transcribe', 25, 'Transcribing lyrics...');
     const lyricsData = await transcribeLyrics(guideData?.stemPath ?? '');
 
     const accentFragment =
@@ -40,13 +54,16 @@ export class ChromaticCorePipeline {
       }
     }
     const finalLyrics = baseLyrics;
+
+    emitProgress('style_parse', 30, 'Parsing style controls...');
     const promptControls = await promptToControls(stylePromptWithAccent);
     const mergedControls = {
       ...promptControls,
       ...payload.controls
     };
 
-    const result = await this.provider.synthesize({
+    emitProgress('synthesis', 35, `Synthesizing vocal (${this.provider.label})...`);
+    const synthesisRequest = {
       voiceModel: payload.voiceModelKey,
       lyrics: finalLyrics ?? lyricsData.transcript,
       controls: mergedControls,
@@ -59,7 +76,10 @@ export class ChromaticCorePipeline {
       prosodyHints: payload.prosodyHints,
       // Beat grid for rhythm-aware synthesis
       beatGrid: pitchData?.beatGrid
-    });
+    };
+
+    const result = await synthesizeWithWaterfall(synthesisRequest, this.provider);
+    emitProgress('synthesis_done', 65, 'Vocal synthesized.');
 
     const outDir = path.join(process.cwd(), 'renders');
     fs.mkdirSync(outDir, { recursive: true });
@@ -67,6 +87,7 @@ export class ChromaticCorePipeline {
     const rawPath = path.join(outDir, `render-${timestamp}.${result.format}`);
     fs.writeFileSync(rawPath, result.audioBuffer);
 
+    emitProgress('effects', 70, 'Applying effects & mastering...');
     const effects = payload.effects ?? { ...defaultEffectSettings };
     const processedPath = await applyAdvancedEffects(rawPath, effects, payload.previewSeconds);
 
@@ -78,7 +99,10 @@ export class ChromaticCorePipeline {
       console.log(`[RenderPipeline] BPM adjustment: ${detectedBpm} → ${payload.targetBpm} (ratio: ${tempoRatio.toFixed(3)})`);
     }
 
+    emitProgress('tempo', 80, 'Adjusting tempo...');
     const tempoAdjustedPath = await applyTempo(processedPath, tempoRatio);
+
+    emitProgress('layers', 88, 'Applying preset layers...');
     const layeredPath = await applyPresetLayers(tempoAdjustedPath, effects.preset);
 
     // Trim output to match guide duration if specified
@@ -92,10 +116,14 @@ export class ChromaticCorePipeline {
       }
     }
 
+    emitProgress('finalize', 95, 'Finalizing output...');
     if (payload.previewSeconds) {
-      return await createPreviewSnippet(finalPath, payload.previewSeconds);
+      const previewPath = await createPreviewSnippet(finalPath, payload.previewSeconds);
+      emitProgress('done', 100, 'Preview ready.');
+      return previewPath;
     }
 
+    emitProgress('done', 100, 'Render complete.');
     return finalPath;
   }
 }
@@ -151,17 +179,8 @@ async function applyPresetLayers(filePath: string, preset?: EffectSettings['pres
   if (preset === 'harmonic-orbit') {
     return applyHarmonicOrbitLayer(filePath);
   }
-  if (preset === 'pitch-warp') {
-    return applyPitchWarpLayer(filePath);
-  }
-  if (preset === 'shimmer-stack') {
-    return applyShimmerStackLayer(filePath);
-  }
   if (preset === 'choir-cloud') {
     return applyChoirCloudLayer(filePath);
-  }
-  if (preset === '8d-swarm') {
-    return apply8DSwarmLayer(filePath);
   }
   return filePath;
 }
@@ -177,26 +196,6 @@ async function applyHarmonicOrbitLayer(filePath: string): Promise<string> {
   return runFilterComplex(filePath, outPath, filter);
 }
 
-async function applyPitchWarpLayer(filePath: string): Promise<string> {
-  const outPath = filePath.replace(/(\.[a-z0-9]+)$/i, '-warp$1');
-  const filter =
-    '[0:a]asplit=2[a][b];' +
-    '[a]asetrate=48000*1.05,aresample=48000,chorus=0.6:0.9:55:0.4:0.25:2[a1];' +
-    '[b]asetrate=48000*0.94,aresample=48000,apulsator=mode=sine:amount=0.8[b1];' +
-    '[a1][b1]amix=2,volume=1[out]';
-  return runFilterComplex(filePath, outPath, filter);
-}
-
-async function applyShimmerStackLayer(filePath: string): Promise<string> {
-  const outPath = filePath.replace(/(\.[a-z0-9]+)$/i, '-shimmer$1');
-  const filter =
-    '[0:a]asplit=2[a][b];' +
-    '[a]apad,atempo=0.98,highpass=f=500,lowpass=f=8000,volume=0.8[a1];' +
-    '[b]asetrate=48000*1.02,aresample=48000,areverb=50:50,volume=0.6[b1];' +
-    '[a1][b1]amix=2,volume=1[out]';
-  return runFilterComplex(filePath, outPath, filter);
-}
-
 async function applyChoirCloudLayer(filePath: string): Promise<string> {
   const outPath = filePath.replace(/(\.[a-z0-9]+)$/i, '-choir$1');
   const filter =
@@ -206,17 +205,6 @@ async function applyChoirCloudLayer(filePath: string): Promise<string> {
     '[c]areverb=60:60:100,volume=0.5[c1];' +
     '[d]adelay=50|50,volume=0.4[d1];' +
     '[a1][b1][c1][d1]amix=4,volume=1[out]';
-  return runFilterComplex(filePath, outPath, filter);
-}
-
-async function apply8DSwarmLayer(filePath: string): Promise<string> {
-  const outPath = filePath.replace(/(\.[a-z0-9]+)$/i, '-8dswarm$1');
-  const filter =
-    '[0:a]asplit=3[a][b][c];' +
-    '[a]aphaser=0.5:0.6:2:0.5:0.5:0.2,pan=stereo|c0=0.9*c0|c1=0.2*c1[a1];' +
-    '[b]asetrate=48000*1.02,aresample=48000,apulsator=mode=sine:amount=0.9:width=90,pan=stereo|c0=0.2*c0|c1=0.9*c1[b1];' +
-    '[c]asetrate=48000*0.98,aresample=48000,flanger=delay=3:depth=2:regen=0.5:speed=0.5,pan=stereo|c0=0.6*c0|c1=0.6*c1[c1];' +
-    '[a1][b1][c1]amix=3,volume=1[out]';
   return runFilterComplex(filePath, outPath, filter);
 }
 

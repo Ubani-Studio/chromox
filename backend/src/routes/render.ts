@@ -44,11 +44,12 @@ router.post('/render', upload.single('guide'), async (req, res) => {
     const accent = req.body.accent;
     const accentLocked = req.body.accentLocked === 'true';
 
-    // Select the appropriate provider based on persona configuration
-    const provider = resolveProvider(persona.provider);
+    // Select provider: use override from UI if provided, otherwise persona default
+    const providerKey = req.body.providerOverride || persona.provider;
+    const provider = resolveProvider(providerKey);
     const pipeline = new ChromaticCorePipeline(provider);
 
-    console.log(`[Render] Using provider: ${provider.label} for persona: ${persona.name}`);
+    console.log(`[Render] Using provider: ${provider.label} (key: ${providerKey}) for persona: ${persona.name}`);
 
     // If this is a cloned voice, merge voice profile characteristics with controls
     if (persona.is_cloned && persona.voice_profile) {

@@ -128,6 +128,7 @@ export async function renderPerformance(payload: {
   guideTempo?: number;
   guide?: File;
   folioClipId?: string;
+  providerOverride?: string;
 }) {
   const formData = new FormData();
   formData.append('personaId', payload.personaId);
@@ -161,6 +162,9 @@ export async function renderPerformance(payload: {
   }
   if (payload.folioClipId) {
     formData.append('folioClipId', payload.folioClipId);
+  }
+  if (payload.providerOverride) {
+    formData.append('providerOverride', payload.providerOverride);
   }
   const { data } = await client.post<{ audioUrl: string; render: RenderHistoryItem }>('/render', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
