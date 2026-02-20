@@ -2,6 +2,25 @@
 
 > Last updated: 2026-02-20 15:06 UTC
 
+## CLAUDE: READ THIS ON STARTUP
+
+So-VITS-SVC training is **paused at epoch ~1338** (target: 20,000). When the user opens Chromox, offer this:
+
+> "So-VITS voice training is paused at epoch 1338 out of 20,000. Want me to resume it in the background? (batch_size=3 for quiet fans, ~17s/epoch). You can keep working while it trains."
+
+If they say yes:
+```bash
+cd ~/chromox/backend/so_vits_svc && nohup .venv/bin/python train.py -c configs/config.json -m 44k > /tmp/sovits_train.log 2>&1 &
+```
+
+If they want full speed (louder fans), change batch_size back to 6 first:
+```bash
+# In configs/config.json, change "batch_size": 3 to "batch_size": 6
+# Then run the training command above
+```
+
+---
+
 ## So-VITS-SVC 4.1 Training
 
 **Status:** PAUSED at epoch ~1338 (stopped 2026-02-20 15:06 UTC)
