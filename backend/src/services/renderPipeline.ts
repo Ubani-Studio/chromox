@@ -6,7 +6,7 @@ import { extractPitchAndTiming, extractVocalStem, transcribeLyrics } from './dsp
 import { promptToControls } from './llm.js';
 import { SingingProvider } from './provider/base.js';
 import { synthesizeWithWaterfall } from './provider/providerRegistry.js';
-import { applyAdvancedEffects, defaultEffectSettings } from './effectsProcessor.js';
+import { applyAdvancedEffects, defaultEffectSettings, restoreVocal } from './effectsProcessor.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
@@ -87,9 +87,13 @@ export class ChromaticCorePipeline {
     const rawPath = path.join(outDir, `render-${timestamp}.${result.format}`);
     fs.writeFileSync(rawPath, result.audioBuffer);
 
-    emitProgress('effects', 70, 'Applying effects & mastering...');
+    // Vocal restoration: denoise + HF recovery on raw SVC output
+    emitProgress('restore', 68, 'Restoring vocal (denoise + HF recovery)...');
+    const restoredPath = await restoreVocal(rawPath);
+
+    emitProgress('effects', 75, 'Applying effects & mastering...');
     const effects = payload.effects ?? { ...defaultEffectSettings };
-    const processedPath = await applyAdvancedEffects(rawPath, effects, payload.previewSeconds);
+    const processedPath = await applyAdvancedEffects(restoredPath, effects, payload.previewSeconds);
 
     // Calculate tempo ratio: if targetBpm specified, compute from detected BPM
     let tempoRatio = payload.guideTempo;
