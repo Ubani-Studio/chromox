@@ -13,7 +13,7 @@ import { VoiceProfile } from './voiceAnalysis';
 import { AccentCategory, VoiceType, detectVoiceCharacteristics } from './voiceDetection';
 import { validateVoiceUsage, fetchVoiceLicense, LicensingTerms } from './provenanceService';
 import { recordHybridUsage } from './usageTracking';
-import { resolveProvider, synthesizeWithWaterfall } from './provider/providerRegistry';
+import { resolveProvider, synthesizeWithWaterfall, openVoiceProvider } from './provider/providerRegistry';
 import { ProviderRequest, ProviderResponse } from './provider/base';
 import { StyleControls } from '../types';
 
@@ -52,7 +52,7 @@ export interface HybridSynthesisRequest {
   voices: VoiceComponent[];
   text: string;
   accentLock?: AccentCategory; // Lock to specific accent
-  routingMode: 'auto' | 'rvc' | 'camb-ai' | 'elevenlabs';
+  routingMode: 'auto' | 'rvc' | 'camb-ai' | 'elevenlabs' | 'openvoice';
   emotion?: string;
   styleHints?: {
     energy?: number;
@@ -523,6 +523,85 @@ export async function synthesizeHybrid(
     ...v,
     weight: totalWeight > 0 ? v.weight / totalWeight : 1 / request.voices.length,
   }));
+
+  // Fast path: when routing picks OpenVoice and the python service is
+  // actually up, do a single-pass embedding-level fusion via
+  // /blend_synthesize. This is the whole reason OpenVoice exists in the
+  // registry — a real fused speaker instead of the audio-level chorus
+  // we get from per-voice synth + ffmpeg amix. If the service isn't
+  // available (scaffold mode, not started, weights missing) we silently
+  // fall through to the weighted-mix path below.
+  if (providerKey === 'openvoice' && (await openVoiceProvider.isAvailable())) {
+    console.log('[HybridSynthesis] OpenVoice fast path: model-level tone-color fusion');
+    try {
+      const toneColors = await Promise.all(
+        normalised.map(async (v) => {
+          const persona = findPersona(v.personaId);
+          if (!persona?.voice_profile?.samplePath) {
+            throw new Error(`Persona ${v.personaId} has no samplePath for tone-color encode`);
+          }
+          const toneColorPath = await openVoiceProvider.ensureToneColor(
+            persona.voice_profile.samplePath,
+          );
+          return { toneColorPath, weight: v.weight };
+        }),
+      );
+
+      const blendResp = await openVoiceProvider.synthesizeBlend(request.text, toneColors);
+
+      const timestamp = Date.now();
+      const outDir = path.join(process.cwd(), 'renders');
+      fs.mkdirSync(outDir, { recursive: true });
+      const fileName = `hybrid-${timestamp}.wav`;
+      const outPath = path.join(outDir, fileName);
+      fs.writeFileSync(outPath, blendResp.audioBuffer);
+
+      const words = request.text.split(/\s+/).filter(Boolean).length;
+      const fallbackDuration = Math.max(1, Math.ceil((words / 150) * 60));
+      const durationSeconds = await probeDurationSeconds(outPath, fallbackDuration);
+
+      const usageBreakdown = await calculateUsageBreakdown(normalised, durationSeconds);
+      const totalCostCents = usageBreakdown.reduce((s, u) => s + u.totalCents, 0);
+
+      const voiceIds = normalised.map((v) => v.personaId);
+      const weights = normalised.map((v) => v.weight);
+      const hybridFingerprint = generateHybridFingerprint(blendedProfile.embedding, voiceIds);
+
+      await recordHybridUsage({
+        hybridFingerprint,
+        provider: 'openvoice',
+        totalDurationSeconds: durationSeconds,
+        voices: usageBreakdown.map((u) => ({
+          personaId: u.personaId,
+          o8IdentityId: u.o8IdentityId,
+          weight: u.weight,
+          ratePerSecondCents: u.ratePerSecondCents,
+          revenueSplit: u.licensing?.revenue_split,
+        })),
+        text: request.text,
+      });
+
+      console.log(
+        `[HybridSynthesis] OpenVoice blend complete. Duration: ${durationSeconds.toFixed(2)}s, out=${fileName}`,
+      );
+
+      return {
+        audioUrl: `/renders/${fileName}`,
+        audioPath: outPath,
+        durationSeconds,
+        provider: 'openvoice',
+        usageBreakdown,
+        totalCostCents,
+        provenance: { hybridFingerprint, voiceIds, weights },
+      };
+    } catch (err) {
+      console.warn(
+        '[HybridSynthesis] OpenVoice fast path failed, falling through to weighted-mix path:',
+        err instanceof Error ? err.message : err,
+      );
+      // Fall through to the per-voice-then-mix path below.
+    }
+  }
 
   // Synthesise each voice through the chosen provider. We use the
   // waterfall so a single provider failure does not kill the whole

@@ -8,6 +8,7 @@ import { FishAudioProvider } from './fishAudioProvider';
 import { CambAiProvider } from './cambAiProvider';
 import { MiniMaxProvider } from './minimaxProvider';
 import { LocalFallbackProvider } from './localFallbackProvider';
+import { OpenVoiceProvider } from './openVoiceProvider';
 import { SingingProvider, ProviderRequest, ProviderResponse } from './base';
 
 const kitsProvider = new KitsAiProvider();
@@ -19,6 +20,7 @@ const openaiProvider = new OpenAIVoiceProvider();
 const fishAudioProvider = new FishAudioProvider();
 const cambAiProvider = new CambAiProvider();
 const minimaxProvider = new MiniMaxProvider();
+const openVoiceProvider = new OpenVoiceProvider();
 const localFallbackProvider = new LocalFallbackProvider();
 
 const providerRegistry: Record<string, SingingProvider> = {
@@ -31,9 +33,14 @@ const providerRegistry: Record<string, SingingProvider> = {
   'fish-audio': fishAudioProvider,
   'camb-ai': cambAiProvider,
   minimax: minimaxProvider,
+  openvoice: openVoiceProvider,
   'chromox-clone': ddspProvider,
   'chromox-labs': elevenLabsProvider
 };
+
+// Re-export the openvoice instance so hybridSynthesis can take its fast
+// path (blend_synthesize) without calling resolveProvider indirectly.
+export { openVoiceProvider };
 
 export function resolveProvider(providerKey: string | undefined) {
   if (!providerKey) return kitsProvider;
