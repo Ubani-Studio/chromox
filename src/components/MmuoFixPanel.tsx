@@ -13,6 +13,11 @@ import { useEffect, useRef, useState } from 'react';
  *      song, streams back a fresh fully-fixed file
  *
  * No ffmpeg, no timestamps, no manual splicing. One panel.
+ *
+ * Dev ports (Mmuo sits at 5170 to stay clear of Slayt on 5174 and
+ * Tizita on 5180):
+ *   Frontend:  http://localhost:5170
+ *   Backend:   http://localhost:4414
  */
 
 const API = 'http://localhost:4414';
