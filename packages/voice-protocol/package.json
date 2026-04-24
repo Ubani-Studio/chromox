@@ -1,7 +1,7 @@
 {
   "name": "@chromox/voice-protocol",
   "version": "1.0.0",
-  "description": "Shared types for Voice Royalty Protocol - Vòxā, o8, Boveda, Imperium integration",
+  "description": "Shared types for Voice Royalty Protocol - Mmuo, o8, Boveda, Imperium integration",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -16,7 +16,7 @@
     "royalty",
     "o8",
     "chromox",
-    "voxa"
+    "mmuo"
   ],
   "author": "Chromox",
   "license": "MIT",

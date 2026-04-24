@@ -42,7 +42,7 @@ export default function App() {
   const [editingPersona, setEditingPersona] = useState<Persona | null>(null);
   const [trainingPersona, setTrainingPersona] = useState<Persona | null>(null);
   const [tasteProfileVersion, setTasteProfileVersion] = useState(0);
-  const [brandName, setBrandName] = useState<'voxa' | 'splurgle'>('voxa');
+  const [brandName, setBrandName] = useState<'mmuo' | 'splurgle'>('mmuo');
   const [adminMode, setAdminMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('chromox_admin') === 'true';
@@ -212,11 +212,11 @@ export default function App() {
             <div className="flex items-center gap-8">
               <h1
                 className="font-display text-lg font-semibold tracking-tight cursor-pointer select-none transition-opacity hover:opacity-70"
-                onClick={() => setBrandName(prev => prev === 'voxa' ? 'splurgle' : 'voxa')}
+                onClick={() => setBrandName(prev => prev === 'mmuo' ? 'splurgle' : 'mmuo')}
                 title="Click to switch brand name"
               >
-                {brandName === 'voxa' ? (
-                  <>Vòx<span style={{letterSpacing: '-0.15em'}}>ā</span></>
+                {brandName === 'mmuo' ? (
+                  'Mmuo'
                 ) : (
                   'Splurgle'
                 )}

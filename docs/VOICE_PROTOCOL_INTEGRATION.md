@@ -5,7 +5,7 @@
 | Component | Status | Notes |
 |-----------|--------|-------|
 | **Phase 1: Core Provenance** | ✅ Complete | |
-| Vòxā provenance registration | ✅ | `POST /api/voice-clone/register-provenance` |
+| Mmuo provenance registration | ✅ | `POST /api/voice-clone/register-provenance` |
 | o8 VoiceDNA creation API | ✅ | `POST /api/identity/create` |
 | Boveda o8 client | ✅ | `packages/rights/src/o8-client.ts` |
 | **Phase 2: Hybrid Synthesis** | ✅ Complete | |
@@ -23,7 +23,7 @@
 ## Overview
 
 This document maps the integration between:
-- **Vòxā** (Voice synthesis + marketplace)
+- **Mmuo** (Voice synthesis + marketplace)
 - **o8** (Provenance + identity)
 - **Boveda** (Character + rights)
 - **Imperium** (On-chain royalty settlement)
@@ -47,27 +47,27 @@ This document maps the integration between:
 
 ---
 
-## 1. Vòxā → o8: Voice Registration
+## 1. Mmuo → o8: Voice Registration
 
-When a voice actor registers their voice on Vòxā, we stamp it with o8 provenance.
+When a voice actor registers their voice on Mmuo, we stamp it with o8 provenance.
 
 ### Data Flow
 
 ```typescript
-// Vòxā VoiceProfile → o8 VoiceDNA mapping
-interface VoxaToO8Mapping {
-  // Vòxā fields
-  voxa_persona_id: string;
-  voxa_embedding: number[];           // 256-dim from voiceAnalysis.ts
-  voxa_characteristics: {
+// Mmuo VoiceProfile → o8 VoiceDNA mapping
+interface MmuoToO8Mapping {
+  // Mmuo fields
+  mmuo_persona_id: string;
+  mmuo_embedding: number[];           // 256-dim from voiceAnalysis.ts
+  mmuo_characteristics: {
     pitchRange: { min: number; max: number; mean: number };
     formants: number[];
     breathiness: number;
     brightness: number;
     vibratoRate: number;
   };
-  voxa_accent: AccentCategory;        // From voiceDetection.ts
-  voxa_voice_type: 'speech' | 'singing' | 'mixed';
+  mmuo_accent: AccentCategory;        // From voiceDetection.ts
+  mmuo_voice_type: 'speech' | 'singing' | 'mixed';
 
   // Maps to o8 VoiceDNA (types.v2.ts)
   o8_voice_dna: {
@@ -86,7 +86,7 @@ interface VoxaToO8Mapping {
     rhythmic_quality: string;
     emotional_resonance: string;
     provider_ids: {
-      chromox: string;                // voxa_persona_id
+      chromox: string;                // mmuo_persona_id
       rvc?: string;
       elevenlabs?: string;
     };
@@ -196,14 +196,14 @@ export async function validateVoiceUsage(
 
 ---
 
-## 3. Boveda → Vòxā: Synthesis Requests
+## 3. Boveda → Mmuo: Synthesis Requests
 
-When Boveda generates audio, it routes through Vòxā for synthesis.
+When Boveda generates audio, it routes through Mmuo for synthesis.
 
 ### Data Flow
 
 ```typescript
-// Boveda requests synthesis from Vòxā
+// Boveda requests synthesis from Mmuo
 interface SynthesisRequest {
   // Character context
   character_id: string;
@@ -222,7 +222,7 @@ interface SynthesisRequest {
   accent_preserve?: boolean;         // Lock diaspora accent
 }
 
-// Vòxā returns
+// Mmuo returns
 interface SynthesisResponse {
   audio_url: string;
   duration_seconds: number;
@@ -242,7 +242,7 @@ interface SynthesisResponse {
 }
 ```
 
-### Hybrid Voice Generation (New Vòxā Feature)
+### Hybrid Voice Generation (New Mmuo Feature)
 
 ```typescript
 // POST /api/voice-clone/synthesize-hybrid
@@ -256,7 +256,7 @@ interface HybridSynthesisRequest {
   routing_mode: 'auto' | 'rvc' | 'camb-ai' | 'elevenlabs';
 }
 
-// Implementation uses Vòxā's auto-detect to route to best provider
+// Implementation uses Mmuo's auto-detect to route to best provider
 // RVC for singing hybrids, CAMB.AI for speech with accent lock
 ```
 
@@ -417,15 +417,15 @@ export interface RoyaltyEvent {
 
 ### Phase 1: Core Integration (Week 1-2)
 
-1. **Vòxā**: Add `POST /register-provenance` endpoint
-2. **o8**: Implement VoiceDNA creation from Vòxā data
+1. **Mmuo**: Add `POST /register-provenance` endpoint
+2. **o8**: Implement VoiceDNA creation from Mmuo data
 3. **Boveda**: Add o8 license fetching to rights package
 4. **Test**: Register voice → verify provenance
 
 ### Phase 2: Synthesis Pipeline (Week 3-4)
 
-1. **Vòxā**: Add `POST /synthesize-hybrid` endpoint
-2. **Vòxā**: Implement voice blending with accent lock
+1. **Mmuo**: Add `POST /synthesize-hybrid` endpoint
+2. **Mmuo**: Implement voice blending with accent lock
 3. **Boveda**: Update ChromoxProvider to use new endpoint
 4. **Test**: Character synthesis → usage tracking
 
@@ -438,9 +438,9 @@ export interface RoyaltyEvent {
 
 ### Phase 4: Marketplace (Week 7-8)
 
-1. **Vòxā**: Voice marketplace UI
-2. **Vòxā**: Browse licensed voices
-3. **Vòxā**: Hybrid voice creator
+1. **Mmuo**: Voice marketplace UI
+2. **Mmuo**: Browse licensed voices
+3. **Mmuo**: Hybrid voice creator
 4. **Test**: Full creator → consumer flow
 
 ---
@@ -491,7 +491,7 @@ POST /api/voice/:id/payout
 |-------|-------|---------------|
 | Voice Actor | 40-60% | They own the voice |
 | Creator (using voice) | 20-30% | They create content |
-| Vòxā Platform | 10-15% | Synthesis infrastructure |
+| Mmuo Platform | 10-15% | Synthesis infrastructure |
 | Boveda Platform | 5-10% | Character + rights |
 | o8 Protocol | 5% | Provenance infrastructure |
 
@@ -503,14 +503,14 @@ POST /api/voice/:id/payout
 
 | Project | Key Files |
 |---------|-----------|
-| **Vòxā** | `backend/src/services/voiceAnalysis.ts`, `backend/src/services/voiceDetection.ts` |
+| **Mmuo** | `backend/src/services/voiceAnalysis.ts`, `backend/src/services/voiceDetection.ts` |
 | **o8** | `src/core/types.v2.ts` (VoiceDNA, LicensingTerms, ChromoxToO8Mapping) |
 | **Boveda** | `packages/rights/src/index.ts`, `packages/ledger/src/index.ts`, `packages/voice/src/providers/chromox.ts` |
 | **Imperium** | `contracts/RoyaltySplit.sol`, `contracts/PayoutModule.sol` |
 
 ---
 
-## 11. Implemented Endpoints (Vòxā)
+## 11. Implemented Endpoints (Mmuo)
 
 ### Voice Clone API (`/api/voice-clone`)
 
@@ -539,11 +539,11 @@ POST /api/voice/:id/payout
 
 ---
 
-## 12. Implemented Services (Vòxā)
+## 12. Implemented Services (Mmuo)
 
 ### `provenanceService.ts`
 - `registerVoiceProvenance()` - Register voice with o8
-- `mapToVoiceDNA()` - Convert Vòxā profile to o8 VoiceDNA
+- `mapToVoiceDNA()` - Convert Mmuo profile to o8 VoiceDNA
 - `generateAudioFingerprint()` - SHA-256 fingerprint
 - `validateVoiceUsage()` - Check o8 license
 
