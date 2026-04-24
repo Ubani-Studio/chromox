@@ -218,6 +218,7 @@ router.post('/fix-section', async (req: Request, res: Response) => {
     const {
       personaVoiceModel,
       sourceTrackId,
+      sourceAudioPath,
       startSec,
       endSec,
       prompt,
@@ -228,6 +229,7 @@ router.post('/fix-section', async (req: Request, res: Response) => {
     } = req.body as {
       personaVoiceModel: string;
       sourceTrackId: string;
+      sourceAudioPath?: string;
       startSec: number;
       endSec: number;
       prompt: string;
@@ -251,13 +253,28 @@ router.post('/fix-section', async (req: Request, res: Response) => {
     const startBeat = startSec / beatSec;
     const endBeat = endSec / beatSec;
 
-    // Build a meter grid covering the section only. Naive 2 syllables
-    // per half-beat until WhisperX-derived timing can replace this.
-    const slots = Math.max(2, Math.round((endBeat - startBeat) * 2));
-    const meterGrid: MeterSlot[] = Array.from({ length: slots }, (_, i) => ({
-      beat: startBeat + i * 0.5,
-      syllables: 2,
-    }));
+    // Preferred path: align the original vocal to extract real per-word
+    // timing for the [startSec, endSec] window, then feed Ibis a grid
+    // that matches the ORIGINAL cadence - not a uniform 2-per-half-beat
+    // placeholder. This is what makes "same voice, same flow, new words"
+    // actually sound like the same take.
+    let meterGrid: MeterSlot[] = [];
+    if (sourceAudioPath) {
+      const fullGrid = await alignToMeter(sourceAudioPath, tempo);
+      meterGrid = fullGrid.filter((slot) => {
+        const slotSec = slot.beat * beatSec;
+        return slotSec >= startSec && slotSec <= endSec;
+      });
+    }
+    // Fallback to a uniform grid when alignment isn't available or the
+    // window lands outside transcribed speech.
+    if (meterGrid.length === 0) {
+      const slots = Math.max(2, Math.round((endBeat - startBeat) * 2));
+      meterGrid = Array.from({ length: slots }, (_, i) => ({
+        beat: startBeat + i * 0.5,
+        syllables: 2,
+      }));
+    }
 
     const ibis = await callIbisMeter({
       meterGrid,
