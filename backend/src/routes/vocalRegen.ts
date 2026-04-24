@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
+import { spawn } from 'child_process';
 import fetch from 'node-fetch';
 import { SunoProvider } from '../services/provider/sunoProvider';
 
@@ -133,6 +134,55 @@ function countSyllables(word: string): number {
   if (!w) return 1;
   const matches = w.match(/[aeiouy]+/g);
   return Math.max(1, matches ? matches.length : 1);
+}
+
+/**
+ * Server-side splice: take the ORIGINAL full song + the regenerated
+ * section clip + start/end seconds, produce a full fixed song with a
+ * short crossfade at each seam so the join isn't audible. Uses ffmpeg
+ * which Chromox already depends on (the local-fallback provider uses
+ * it too). This removes the "user runs ffmpeg manually" friction.
+ *
+ * Output lives in /tmp with a timestamped name; caller returns the path.
+ */
+function spliceFix(
+  originalPath: string,
+  newSectionPath: string,
+  startSec: number,
+  endSec: number,
+  outPath: string
+): Promise<void> {
+  const crossfade = 0.05; // 50ms crossfade at each seam
+  // Filter graph:
+  //   [0] before = original [0, startSec-xfade]
+  //   [1]        = new section (the fix)
+  //   [0] after  = original [endSec-xfade, end]
+  //   crossfade: before <-> fix <-> after
+  const filter =
+    `[0:a]atrim=0:${Math.max(0, startSec - crossfade)},asetpts=PTS-STARTPTS[pre];` +
+    `[0:a]atrim=${Math.max(0, endSec - crossfade)},asetpts=PTS-STARTPTS[post];` +
+    `[pre][1:a]acrossfade=d=${crossfade}[mid];` +
+    `[mid][post]acrossfade=d=${crossfade}[out]`;
+
+  return new Promise((resolve, reject) => {
+    const child = spawn('ffmpeg', [
+      '-y',
+      '-i', originalPath,
+      '-i', newSectionPath,
+      '-filter_complex', filter,
+      '-map', '[out]',
+      '-c:a', 'libmp3lame',
+      '-q:a', '2',
+      outPath,
+    ]);
+    let stderr = '';
+    child.stderr.on('data', (d) => { stderr += d.toString(); });
+    child.on('error', reject);
+    child.on('close', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`ffmpeg splice exited ${code}: ${stderr.slice(-400)}`));
+    });
+  });
 }
 
 // POST /api/vocal-regen/rewrite -------------------------------------------
@@ -303,14 +353,32 @@ router.post('/fix-section', async (req: Request, res: Response) => {
       bpm: tempo,
     });
 
-    const outPath = path.join(
+    const sectionPath = path.join(
       '/tmp',
-      `chromox-fix-${Date.now()}.${out.format}`
+      `mmuo-section-${Date.now()}.${out.format}`
     );
-    fs.writeFileSync(outPath, out.audioBuffer);
+    fs.writeFileSync(sectionPath, out.audioBuffer);
+
+    // Auto-splice: if the caller gave us the source audio, produce the
+    // full fixed song back (crossfade seams) so the user doesn't have to
+    // run ffmpeg themselves. Otherwise return just the section so they
+    // can wire it up however they want.
+    let splicedPath: string | null = null;
+    if (sourceAudioPath && fs.existsSync(sourceAudioPath)) {
+      splicedPath = path.join('/tmp', `mmuo-fixed-${Date.now()}.mp3`);
+      try {
+        await spliceFix(sourceAudioPath, sectionPath, startSec, endSec, splicedPath);
+      } catch (e) {
+        // Splice failed (ffmpeg missing, codec issue) - we still return
+        // the section audio so the user has a fallback.
+        splicedPath = null;
+      }
+    }
 
     res.json({
-      audioPath: outPath,
+      sectionPath,
+      fixedPath: splicedPath,
+      audioPath: splicedPath || sectionPath, // legacy field, prefer fixedPath when present
       newLyrics: ibis.lyrics,
       rawText: ibis.raw_text,
       inSpec: ibis.in_spec,
@@ -319,6 +387,55 @@ router.post('/fix-section', async (req: Request, res: Response) => {
     const msg = e instanceof Error ? e.message : 'fix-section failed';
     res.status(500).json({ error: msg });
   }
+});
+
+// POST /api/vocal-regen/transcribe ----------------------------------------
+// Word-level transcription of an uploaded file so the UI can render
+// clickable words to define the fix window. Lets the user pick "from
+// here to here" by selecting transcribed words instead of finding
+// timestamps by ear.
+router.post('/transcribe', async (req: Request, res: Response) => {
+  try {
+    const { sourceAudioPath } = req.body as { sourceAudioPath: string };
+    if (!sourceAudioPath || !fs.existsSync(sourceAudioPath)) {
+      return res.status(400).json({ error: 'sourceAudioPath required + must exist on disk' });
+    }
+    const { transcribeWithAlignment } = await import(
+      '../services/transcriptionEnsemble.js'
+    );
+    const align = await (transcribeWithAlignment as unknown as (
+      p: string
+    ) => Promise<{
+      words: Array<{ word: string; start: number; end: number }>;
+      text?: string;
+    }>)(sourceAudioPath);
+    res.json({
+      words: align.words || [],
+      text: align.text || (align.words || []).map((w) => w.word).join(' '),
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'transcribe failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// GET /api/vocal-regen/audio?path=... --------------------------------------
+// Stream audio files out of /tmp so the UI can <audio src> the response
+// without needing direct filesystem access. Restricts path to /tmp for
+// safety.
+router.get('/audio', (req: Request, res: Response) => {
+  const p = String(req.query.path || '');
+  if (!p.startsWith('/tmp/')) {
+    return res.status(403).json({ error: 'path outside /tmp' });
+  }
+  if (!fs.existsSync(p)) return res.status(404).json({ error: 'not found' });
+  const ext = path.extname(p).toLowerCase();
+  const ct =
+    ext === '.mp3' ? 'audio/mpeg' :
+    ext === '.wav' ? 'audio/wav' :
+    ext === '.m4a' ? 'audio/mp4' : 'application/octet-stream';
+  res.setHeader('Content-Type', ct);
+  fs.createReadStream(p).pipe(res);
 });
 
 // POST /api/vocal-regen/meter-only ----------------------------------------
