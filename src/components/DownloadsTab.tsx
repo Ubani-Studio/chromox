@@ -343,12 +343,12 @@ export function DownloadsTab({
             )}
 
             {!isCollapsed && (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="flex flex-col gap-px bg-border-default border border-border-default">
               {group.jobs.map((job) => {
                 const persona = personas.find((p) => p.id === job.personaId);
                 const guideSampleName = persona?.guide_samples?.find((sample) => sample.id === job.guideSampleId)?.name;
                 return (
-                  <div key={job.id} className="rounded-2xl border border-border-default bg-surface p-4 flex flex-col">
+                  <div key={job.id} className="bg-surface p-4 flex flex-col transition-colors hover:bg-elevated">
               {/* Header */}
               <div className="mb-2">
                 {editingPersonaId === job.id ? (

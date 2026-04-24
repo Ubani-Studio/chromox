@@ -7,11 +7,13 @@ type Props = {
   variant?: 'generated' | 'pack';
 };
 
+// Tier palette uses Tyrian opacity gradient only - no chromatic noise.
+// Rarer tiers just carry more accent weight on the border + fill.
 const tierColors: Record<number, string> = {
   1: 'border-border-default bg-surface',
-  2: 'border-accent/30 bg-accent/5',
-  3: 'border-yellow-500/30 bg-yellow-500/5',
-  4: 'border-purple-500/30 bg-purple-500/5'
+  2: 'border-accent/20 bg-accent/5',
+  3: 'border-accent/40 bg-accent/8',
+  4: 'border-accent/60 bg-accent/12'
 };
 
 const tierLabels: Record<number, string> = {
@@ -26,18 +28,16 @@ export function RelicCard({ relic, variant = 'generated' }: Props) {
   const tierLabel = tierLabels[relic.tier] ?? 'Common';
 
   return (
-    <div className={`rounded-xl border p-4 transition ${colorClass}`}>
+    <div className={`border p-4 transition ${colorClass}`}>
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-elevated text-lg">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-elevated text-lg">
           {relic.icon}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <h4 className="truncate text-sm font-medium text-primary">{relic.name}</h4>
-            <span className={`shrink-0 rounded-md px-2 py-0.5 text-[9px] font-medium tracking-tight ${
-              relic.tier >= 3 ? 'bg-yellow-500/15 text-yellow-500' :
-              relic.tier >= 2 ? 'bg-accent/15 text-accent' :
-              'bg-elevated text-muted'
+            <span className={`shrink-0 px-2 py-0.5 text-[9px] font-medium tracking-tight ${
+              relic.tier >= 2 ? 'bg-accent/15 text-accent' : 'bg-elevated text-muted'
             }`}>
               {tierLabel}
             </span>
