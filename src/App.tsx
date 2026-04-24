@@ -24,9 +24,10 @@ import { DownloadsTab } from './components/DownloadsTab';
 import { EditPersonaModal } from './components/EditPersonaModal';
 import { VoiceTrainingModal } from './components/VoiceTrainingModal';
 import { AudioProvider } from './contexts/AudioContext';
-// Icons intentionally not imported here - sidebar is text-only per
-// minimal-luxury-restraint register. Child components still use their
-// own icons where function (upload, chevron, spinner) requires them.
+// Icons kept for a few functional spots inside tabs (persona tile
+// affordances, empty-state illustrations). The sidebar nav is text-only
+// per minimal-luxury register - never use these in the tab labels.
+import { LogoIcon, MicIcon } from './components/Icons';
 import { BovedaTab } from './components/boveda/BovedaTab';
 import { VoiceLibraryTab } from './components/VoiceLibraryTab';
 import { AdminFlowTab } from './components/AdminFlowTab';
@@ -220,9 +221,6 @@ export default function App() {
             <h1 className="font-display text-2xl font-semibold tracking-tight select-none text-primary">
               Mmuo
             </h1>
-            <p className="text-xs text-muted mt-1 tracking-tight">
-              Persona forge
-            </p>
           </div>
 
           <nav className="flex-1 px-3 pt-4 flex flex-col gap-0.5">
