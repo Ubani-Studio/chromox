@@ -14,6 +14,7 @@ import reliquaryRoutes from './routes/reliquary';
 import usageRoutes from './routes/usage';
 import photoRoutes from './routes/photos';
 import adminRenderRoutes from './routes/adminRender';
+import vocalRegenRoutes from './routes/vocalRegen';
 import { config } from './config';
 import { renderProgress } from './services/renderPipeline';
 
@@ -40,6 +41,10 @@ app.use('/api/voice-clone', voiceCloneRoutes);
 app.use('/api/usage', usageRoutes);
 app.use('/api', photoRoutes);
 app.use('/api', adminRenderRoutes);
+// Persona-locked vocal regeneration (Suno + Ibis metering). Uses the
+// "Mmuo" product naming externally; keeps the existing module paths
+// for minimal breakage until the full rebrand lands.
+app.use('/api/vocal-regen', vocalRegenRoutes);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok', engine: 'Persona Synth Kernel' }));
 

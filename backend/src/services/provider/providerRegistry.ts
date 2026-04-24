@@ -9,6 +9,7 @@ import { CambAiProvider } from './cambAiProvider';
 import { MiniMaxProvider } from './minimaxProvider';
 import { LocalFallbackProvider } from './localFallbackProvider';
 import { OpenVoiceProvider } from './openVoiceProvider';
+import { SunoProvider } from './sunoProvider';
 import { SingingProvider, ProviderRequest, ProviderResponse } from './base';
 
 const kitsProvider = new KitsAiProvider();
@@ -21,6 +22,7 @@ const fishAudioProvider = new FishAudioProvider();
 const cambAiProvider = new CambAiProvider();
 const minimaxProvider = new MiniMaxProvider();
 const openVoiceProvider = new OpenVoiceProvider();
+const sunoProvider = new SunoProvider();
 const localFallbackProvider = new LocalFallbackProvider();
 
 const providerRegistry: Record<string, SingingProvider> = {
@@ -34,9 +36,16 @@ const providerRegistry: Record<string, SingingProvider> = {
   'camb-ai': cambAiProvider,
   minimax: minimaxProvider,
   openvoice: openVoiceProvider,
+  // Suno is reserved for vocals that were originally generated on Suno.
+  // voiceModel format: "persona_id:<id>[|seed:<n>]"
+  suno: sunoProvider,
   'chromox-clone': ddspProvider,
   'chromox-labs': elevenLabsProvider
 };
+
+// Named export so vocalRegen.ts can call provider.inpaint() without
+// losing the Suno-specific typing.
+export { sunoProvider };
 
 // Re-export the openvoice instance so hybridSynthesis can take its fast
 // path (blend_synthesize) without calling resolveProvider indirectly.
