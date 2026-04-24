@@ -42,7 +42,8 @@ export default function App() {
   const [editingPersona, setEditingPersona] = useState<Persona | null>(null);
   const [trainingPersona, setTrainingPersona] = useState<Persona | null>(null);
   const [tasteProfileVersion, setTasteProfileVersion] = useState(0);
-  const [brandName, setBrandName] = useState<'mmuo' | 'splurgle'>('mmuo');
+  // Brand locked to Mmuo. Splurgle toggle was a brand-exploration
+  // artefact; removed once Mmuo was chosen.
   const [adminMode, setAdminMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('chromox_admin') === 'true';
@@ -210,16 +211,8 @@ export default function App() {
           <div className="mx-auto flex max-w-[1800px] items-center justify-between px-6 py-3">
             {/* Left: Logo + Tabs */}
             <div className="flex items-center gap-8">
-              <h1
-                className="font-display text-lg font-semibold tracking-tight cursor-pointer select-none transition-opacity hover:opacity-70"
-                onClick={() => setBrandName(prev => prev === 'mmuo' ? 'splurgle' : 'mmuo')}
-                title="Click to switch brand name"
-              >
-                {brandName === 'mmuo' ? (
-                  'Mmuo'
-                ) : (
-                  'Splurgle'
-                )}
+              <h1 className="font-display text-lg font-semibold tracking-tight select-none">
+                Mmuo
               </h1>
 
               {/* Tab Navigation */}
