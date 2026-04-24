@@ -240,24 +240,24 @@ export function VoiceLibraryTab({ personas, onRefresh }: Props) {
       {/* Stats Row */}
       <div className="mb-6 grid grid-cols-5 gap-4">
         <div className="rounded-xl border border-border-default bg-surface p-4">
-          <p className="text-xs uppercase tracking-wide text-muted">Total Samples</p>
+          <p className="text-xs tracking-tight text-muted">Total Samples</p>
           <p className="font-display text-2xl font-semibold">{stats.total}</p>
         </div>
         <div className="rounded-xl border border-border-default bg-surface p-4">
-          <p className="text-xs uppercase tracking-wide text-muted">Tested</p>
+          <p className="text-xs tracking-tight text-muted">Tested</p>
           <p className="font-display text-2xl font-semibold">{stats.testedSamples}</p>
           <p className="text-[10px] text-muted">used at least once</p>
         </div>
         <div className="rounded-xl border border-border-default bg-surface p-4">
-          <p className="text-xs uppercase tracking-wide text-muted">Total Uses</p>
+          <p className="text-xs tracking-tight text-muted">Total Uses</p>
           <p className="font-display text-2xl font-semibold">{stats.totalUses}</p>
         </div>
         <div className="rounded-xl border border-accent/30 bg-accent/5 p-4">
-          <p className="text-xs uppercase tracking-wide text-accent">Liked Renders</p>
+          <p className="text-xs tracking-tight text-accent">Liked Renders</p>
           <p className="font-display text-2xl font-semibold text-accent">{stats.totalLikes}</p>
         </div>
         <div className="rounded-xl border border-border-default bg-surface p-4">
-          <p className="text-xs uppercase tracking-wide text-muted">Conviction Rate</p>
+          <p className="text-xs tracking-tight text-muted">Conviction Rate</p>
           <p className="font-display text-2xl font-semibold">
             {stats.totalUses > 0 ? Math.round((stats.totalLikes / stats.totalUses) * 100) : 0}%
           </p>
@@ -267,7 +267,7 @@ export function VoiceLibraryTab({ personas, onRefresh }: Props) {
       {/* Recommended Section */}
       {recommendedSamples.length > 0 && (
         <div className="mb-6">
-          <h2 className="mb-3 flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-wide text-accent">
+          <h2 className="mb-3 flex items-center gap-2 font-display text-sm font-semibold tracking-tight text-accent">
             <span className="text-lg">★</span> High Conviction Samples
           </h2>
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
@@ -277,7 +277,7 @@ export function VoiceLibraryTab({ personas, onRefresh }: Props) {
                 className="rounded-xl border-2 border-accent/30 bg-gradient-to-br from-accent/5 to-transparent p-3"
               >
                 <div className="mb-1 flex items-center justify-between">
-                  <p className="text-[10px] uppercase tracking-wider text-muted">{sample.personaName}</p>
+                  <p className="text-[10px] tracking-tight text-muted">{sample.personaName}</p>
                   <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent">
                     {sample.effectivenessScore}%
                   </span>
@@ -295,7 +295,7 @@ export function VoiceLibraryTab({ personas, onRefresh }: Props) {
       {/* Samples to Test */}
       {samplesToTest.length > 0 && (
         <div className="mb-6">
-          <h2 className="mb-3 flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-wide text-secondary">
+          <h2 className="mb-3 flex items-center gap-2 font-display text-sm font-semibold tracking-tight text-secondary">
             <span className="text-lg">◐</span> Needs More Testing
             <span className="text-xs font-normal normal-case text-muted">(1-4 uses)</span>
           </h2>
@@ -384,7 +384,7 @@ export function VoiceLibraryTab({ personas, onRefresh }: Props) {
             >
               <div className="mb-2 flex items-start justify-between">
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs uppercase tracking-wider text-muted">{sample.personaName}</p>
+                  <p className="text-xs tracking-tight text-muted">{sample.personaName}</p>
                   <h3 className="font-display text-lg font-medium truncate">{sample.name}</h3>
                 </div>
                 {/* Effectiveness Score Badge */}
@@ -481,7 +481,7 @@ export function VoiceLibraryTab({ personas, onRefresh }: Props) {
 
             <div className="mt-4 space-y-3">
               <div>
-                <label className="text-xs font-medium uppercase tracking-wide text-muted">Video URL</label>
+                <label className="text-xs font-medium tracking-tight text-muted">Video URL</label>
                 <input
                   className="mt-1 w-full rounded-xl border border-border-default bg-canvas px-3 py-2 text-sm text-primary placeholder-disabled focus:border-accent focus:outline-none"
                   placeholder="https://youtube.com/watch?v=..."
@@ -491,7 +491,7 @@ export function VoiceLibraryTab({ personas, onRefresh }: Props) {
               </div>
 
               <div>
-                <label className="text-xs font-medium uppercase tracking-wide text-muted">Sample Name (optional)</label>
+                <label className="text-xs font-medium tracking-tight text-muted">Sample Name (optional)</label>
                 <input
                   className="mt-1 w-full rounded-xl border border-border-default bg-canvas px-3 py-2 text-sm text-primary placeholder-disabled focus:border-accent focus:outline-none"
                   placeholder="Voice Reference"
@@ -501,7 +501,7 @@ export function VoiceLibraryTab({ personas, onRefresh }: Props) {
               </div>
 
               <div>
-                <label className="text-xs font-medium uppercase tracking-wide text-muted">Add to Persona</label>
+                <label className="text-xs font-medium tracking-tight text-muted">Add to Persona</label>
                 <select
                   className="mt-1 w-full rounded-xl border border-border-default bg-canvas px-3 py-2 text-sm text-primary focus:border-accent focus:outline-none"
                   value={importPersonaId}
@@ -583,7 +583,7 @@ export function VoiceLibraryTab({ personas, onRefresh }: Props) {
                         />
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs uppercase tracking-wide text-muted">{video.platform}</p>
+                        <p className="text-xs tracking-tight text-muted">{video.platform}</p>
                         <h4 className="font-medium truncate">{video.title}</h4>
                         <p className="text-xs text-secondary truncate">{video.url}</p>
                       </div>
@@ -596,7 +596,7 @@ export function VoiceLibraryTab({ personas, onRefresh }: Props) {
             {selectedFolioVideo && (
               <div className="mt-4 space-y-3 border-t border-border-default pt-4">
                 <div>
-                  <label className="text-xs font-medium uppercase tracking-wide text-muted">Sample Name</label>
+                  <label className="text-xs font-medium tracking-tight text-muted">Sample Name</label>
                   <input
                     className="mt-1 w-full rounded-xl border border-border-default bg-canvas px-3 py-2 text-sm text-primary placeholder-disabled focus:border-accent focus:outline-none"
                     placeholder={selectedFolioVideo.title}
@@ -606,7 +606,7 @@ export function VoiceLibraryTab({ personas, onRefresh }: Props) {
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium uppercase tracking-wide text-muted">Add to Persona</label>
+                  <label className="text-xs font-medium tracking-tight text-muted">Add to Persona</label>
                   <select
                     className="mt-1 w-full rounded-xl border border-border-default bg-canvas px-3 py-2 text-sm text-primary focus:border-accent focus:outline-none"
                     value={importPersonaId}

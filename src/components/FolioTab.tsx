@@ -482,7 +482,7 @@ export function FolioTab({
               <button
                 onClick={handleUpload}
                 disabled={uploading}
-                className="rounded-lg bg-accent px-4 py-2 text-xs font-medium uppercase tracking-wider text-canvas transition hover:bg-accent-hover disabled:opacity-50"
+                className="rounded-lg bg-accent px-4 py-2 text-xs font-medium tracking-tight text-canvas transition hover:bg-accent-hover disabled:opacity-50"
               >
                 {uploading ? 'Uploading...' : 'Add'}
               </button>
@@ -563,7 +563,7 @@ export function FolioTab({
           <div key={group.label || groupIndex}>
             {group.label && (
               <div className="mb-4 flex items-center gap-3">
-                <p className="text-xs font-medium uppercase tracking-wider text-muted">{group.label}</p>
+                <p className="text-xs font-medium tracking-tight text-muted">{group.label}</p>
                 <span className="rounded-full bg-elevated px-2 py-0.5 text-[10px] text-secondary">{group.clips.length}</span>
                 <div className="h-px flex-1 bg-border-default" />
               </div>
@@ -594,11 +594,11 @@ export function FolioTab({
                     <div className="mb-2 flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-xs uppercase tracking-wider text-muted">
+                          <p className="text-xs tracking-tight text-muted">
                             {clip.sourcePersonaName || (isGuide ? 'Guide' : clip.source === 'render' ? 'Render' : 'Upload')}
                           </p>
                           {isDuplicate && (
-                            <span className="rounded-full bg-error/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-error">
+                            <span className="rounded-full bg-error/20 px-2 py-0.5 text-[10px] font-semibold tracking-tight text-error">
                               Duplicate
                             </span>
                           )}
@@ -649,7 +649,7 @@ export function FolioTab({
                       <div className="flex gap-2">
                         <button
                           onClick={() => onSelectClip(clip.id)}
-                          className={`flex-1 rounded-lg px-3 py-2 text-xs font-medium uppercase tracking-wider transition ${
+                          className={`flex-1 rounded-lg px-3 py-2 text-xs font-medium tracking-tight transition ${
                             isSelectedAsGuide
                               ? 'bg-accent text-canvas'
                               : 'border border-border-default bg-surface text-secondary hover:bg-overlay'
@@ -709,7 +709,7 @@ export function FolioTab({
               Are you sure you want to delete {deletableCount} clip{deletableCount !== 1 ? 's' : ''}? This cannot be undone.
             </p>
             <div className="mt-4 max-h-40 overflow-y-auto rounded-xl bg-elevated p-3">
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted">Files to delete:</p>
+              <p className="mb-2 text-xs font-medium tracking-tight text-muted">Files to delete:</p>
               <ul className="space-y-1 text-sm text-primary">
                 {Array.from(selectedIds).map(id => {
                   const clip = clips.find(c => c.id === id);

@@ -93,7 +93,7 @@ export function SonicGenomeDrawer({ open, onClose }: Props) {
           <div className="mt-4 flex gap-1">
             <button
               onClick={() => setTab('genome')}
-              className={`rounded-lg px-4 py-2 text-xs font-medium uppercase tracking-wide transition ${
+              className={`rounded-lg px-4 py-2 text-xs font-medium tracking-tight transition ${
                 tab === 'genome'
                   ? 'bg-accent/15 text-accent'
                   : 'text-muted hover:text-secondary'
@@ -103,7 +103,7 @@ export function SonicGenomeDrawer({ open, onClose }: Props) {
             </button>
             <button
               onClick={() => setTab('tuning')}
-              className={`rounded-lg px-4 py-2 text-xs font-medium uppercase tracking-wide transition ${
+              className={`rounded-lg px-4 py-2 text-xs font-medium tracking-tight transition ${
                 tab === 'tuning'
                   ? 'bg-accent/15 text-accent'
                   : 'text-muted hover:text-secondary'
@@ -137,7 +137,7 @@ export function SonicGenomeDrawer({ open, onClose }: Props) {
                     {primary?.glyph ?? 'VOID'}
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted">
+                    <p className="text-xs font-medium tracking-tight text-muted">
                       {primary?.designation ?? 'NULL'} \u00B7 {primary?.creativeMode ?? 'Receptive'}
                     </p>
                     <h3 className="font-display text-lg font-semibold" style={{ color: primary?.color }}>
@@ -147,7 +147,7 @@ export function SonicGenomeDrawer({ open, onClose }: Props) {
                       {primary?.essence ?? 'Open, unclassified. Pure potential.'}
                     </p>
                     <div className="mt-2 flex items-center gap-2">
-                      <span className="text-[10px] font-medium uppercase tracking-wide text-muted">Confidence</span>
+                      <span className="text-[10px] font-medium tracking-tight text-muted">Confidence</span>
                       <div className="h-1.5 flex-1 rounded-full bg-elevated">
                         <div
                           className="h-full rounded-full transition-all"
@@ -168,7 +168,7 @@ export function SonicGenomeDrawer({ open, onClose }: Props) {
               {/* Secondary Archetype */}
               {secondary && (
                 <div className="rounded-xl border border-border-default bg-surface p-4">
-                  <p className="text-[10px] font-medium uppercase tracking-wide text-muted">Secondary Archetype</p>
+                  <p className="text-[10px] font-medium tracking-tight text-muted">Secondary Archetype</p>
                   <div className="mt-1 flex items-center gap-3">
                     <span className="text-lg font-bold" style={{ color: secondary.color }}>
                       {secondary.glyph}
@@ -186,7 +186,7 @@ export function SonicGenomeDrawer({ open, onClose }: Props) {
               {/* Distribution Grid */}
               {distEntries.length > 0 && (
                 <div className="rounded-xl border border-border-default bg-surface p-4">
-                  <p className="mb-3 text-[10px] font-medium uppercase tracking-wide text-muted">
+                  <p className="mb-3 text-[10px] font-medium tracking-tight text-muted">
                     Archetype Distribution
                   </p>
                   <div className="space-y-2">
@@ -218,7 +218,7 @@ export function SonicGenomeDrawer({ open, onClose }: Props) {
               {gam && (
                 <div className="rounded-xl border border-border-default bg-surface p-4">
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-muted">
+                    <p className="text-[10px] font-medium tracking-tight text-muted">
                       Tier: {gam.tierName}
                     </p>
                     <span className="font-mono text-sm font-semibold text-accent">
@@ -242,22 +242,22 @@ export function SonicGenomeDrawer({ open, onClose }: Props) {
                   <div className="mt-3 grid grid-cols-3 gap-3 text-center">
                     <div className="rounded-lg bg-elevated p-2">
                       <p className="text-lg font-semibold text-primary">{gam.totalRenders}</p>
-                      <p className="text-[9px] uppercase tracking-wide text-muted">Renders</p>
+                      <p className="text-[9px] tracking-tight text-muted">Renders</p>
                     </div>
                     <div className="rounded-lg bg-elevated p-2">
                       <p className="text-lg font-semibold text-primary">{gam.totalLikes}</p>
-                      <p className="text-[9px] uppercase tracking-wide text-muted">Likes</p>
+                      <p className="text-[9px] tracking-tight text-muted">Likes</p>
                     </div>
                     <div className="rounded-lg bg-elevated p-2">
                       <p className="text-lg font-semibold text-primary">{gam.streak}</p>
-                      <p className="text-[9px] uppercase tracking-wide text-muted">Streak</p>
+                      <p className="text-[9px] tracking-tight text-muted">Streak</p>
                     </div>
                   </div>
 
                   {/* Achievements */}
                   {gam.achievements.length > 0 && (
                     <div className="mt-3">
-                      <p className="mb-2 text-[10px] font-medium uppercase tracking-wide text-muted">Achievements</p>
+                      <p className="mb-2 text-[10px] font-medium tracking-tight text-muted">Achievements</p>
                       <div className="flex flex-wrap gap-2">
                         {gam.achievements.map((id) => (
                           <span
@@ -276,7 +276,7 @@ export function SonicGenomeDrawer({ open, onClose }: Props) {
               {/* Top Sonic Keywords */}
               {genome.topKeywords.length > 0 && (
                 <div className="rounded-xl border border-border-default bg-surface p-4">
-                  <p className="mb-3 text-[10px] font-medium uppercase tracking-wide text-muted">
+                  <p className="mb-3 text-[10px] font-medium tracking-tight text-muted">
                     Top Sonic Keywords
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -300,37 +300,37 @@ export function SonicGenomeDrawer({ open, onClose }: Props) {
               {(genome.sonicPatterns.dominantTextures.length > 0 ||
                 genome.sonicPatterns.preferredMoods.length > 0) && (
                 <div className="rounded-xl border border-border-default bg-surface p-4">
-                  <p className="mb-3 text-[10px] font-medium uppercase tracking-wide text-muted">
+                  <p className="mb-3 text-[10px] font-medium tracking-tight text-muted">
                     Sonic Patterns
                   </p>
                   <div className="grid gap-3 sm:grid-cols-2">
                     {genome.sonicPatterns.dominantTextures.length > 0 && (
                       <div>
-                        <p className="text-[9px] uppercase tracking-wide text-muted">Textures</p>
+                        <p className="text-[9px] tracking-tight text-muted">Textures</p>
                         <p className="text-sm text-primary">{genome.sonicPatterns.dominantTextures.join(', ')}</p>
                       </div>
                     )}
                     {genome.sonicPatterns.preferredMoods.length > 0 && (
                       <div>
-                        <p className="text-[9px] uppercase tracking-wide text-muted">Moods</p>
+                        <p className="text-[9px] tracking-tight text-muted">Moods</p>
                         <p className="text-sm text-primary">{genome.sonicPatterns.preferredMoods.join(', ')}</p>
                       </div>
                     )}
                     {genome.sonicPatterns.productionStyle.length > 0 && (
                       <div>
-                        <p className="text-[9px] uppercase tracking-wide text-muted">Production</p>
+                        <p className="text-[9px] tracking-tight text-muted">Production</p>
                         <p className="text-sm text-primary">{genome.sonicPatterns.productionStyle.join(', ')}</p>
                       </div>
                     )}
                     {genome.sonicPatterns.vocalPreference.length > 0 && (
                       <div>
-                        <p className="text-[9px] uppercase tracking-wide text-muted">Vocal</p>
+                        <p className="text-[9px] tracking-tight text-muted">Vocal</p>
                         <p className="text-sm text-primary">{genome.sonicPatterns.vocalPreference.join(', ')}</p>
                       </div>
                     )}
                     {genome.sonicPatterns.spatialPreference.length > 0 && (
                       <div>
-                        <p className="text-[9px] uppercase tracking-wide text-muted">Space</p>
+                        <p className="text-[9px] tracking-tight text-muted">Space</p>
                         <p className="text-sm text-primary">{genome.sonicPatterns.spatialPreference.join(', ')}</p>
                       </div>
                     )}
@@ -353,26 +353,26 @@ export function SonicGenomeDrawer({ open, onClose }: Props) {
           {!loading && genome && tab === 'tuning' && (
             <div className="space-y-6">
               <div className="rounded-xl border border-border-default bg-surface p-4">
-                <p className="mb-3 text-[10px] font-medium uppercase tracking-wide text-muted">
+                <p className="mb-3 text-[10px] font-medium tracking-tight text-muted">
                   Governance Metrics
                 </p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="rounded-lg bg-elevated p-3">
-                    <p className="text-[10px] uppercase tracking-wide text-muted">Signal Count</p>
+                    <p className="text-[10px] tracking-tight text-muted">Signal Count</p>
                     <p className="text-xl font-semibold text-primary">{genome.signalCount}</p>
                   </div>
                   <div className="rounded-lg bg-elevated p-3">
-                    <p className="text-[10px] uppercase tracking-wide text-muted">Item Count</p>
+                    <p className="text-[10px] tracking-tight text-muted">Item Count</p>
                     <p className="text-xl font-semibold text-primary">{genome.itemCount}</p>
                   </div>
                   <div className="rounded-lg bg-elevated p-3">
-                    <p className="text-[10px] uppercase tracking-wide text-muted">Confidence</p>
+                    <p className="text-[10px] tracking-tight text-muted">Confidence</p>
                     <p className="text-xl font-semibold text-primary">
                       {Math.round(genome.confidence * 100)}%
                     </p>
                   </div>
                   <div className="rounded-lg bg-elevated p-3">
-                    <p className="text-[10px] uppercase tracking-wide text-muted">Unique Effects</p>
+                    <p className="text-[10px] tracking-tight text-muted">Unique Effects</p>
                     <p className="text-xl font-semibold text-primary">
                       {gam?.uniqueEffects.length ?? 0}
                     </p>
@@ -382,7 +382,7 @@ export function SonicGenomeDrawer({ open, onClose }: Props) {
 
               {gam && gam.uniqueEffects.length > 0 && (
                 <div className="rounded-xl border border-border-default bg-surface p-4">
-                  <p className="mb-2 text-[10px] font-medium uppercase tracking-wide text-muted">
+                  <p className="mb-2 text-[10px] font-medium tracking-tight text-muted">
                     Effects Used
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -397,7 +397,7 @@ export function SonicGenomeDrawer({ open, onClose }: Props) {
 
               {gam && gam.uniqueGuides.length > 0 && (
                 <div className="rounded-xl border border-border-default bg-surface p-4">
-                  <p className="mb-2 text-[10px] font-medium uppercase tracking-wide text-muted">
+                  <p className="mb-2 text-[10px] font-medium tracking-tight text-muted">
                     Guides Used
                   </p>
                   <p className="text-sm text-secondary">{gam.uniqueGuides.length} unique guides explored</p>
@@ -405,7 +405,7 @@ export function SonicGenomeDrawer({ open, onClose }: Props) {
               )}
 
               <div className="rounded-xl border border-border-default bg-surface p-4">
-                <p className="mb-2 text-[10px] font-medium uppercase tracking-wide text-muted">
+                <p className="mb-2 text-[10px] font-medium tracking-tight text-muted">
                   Avoid Textures
                 </p>
                 {genome.sonicPatterns.avoidTextures.length > 0 ? (

@@ -25,7 +25,7 @@ export function PersonaCard({ persona, active, onSelect }: PersonaCardProps) {
                 <LogoIcon className="text-accent" size={14} />
               </div>
             )}
-            <span className="text-xs font-medium uppercase tracking-wider text-muted">
+            <span className="text-xs font-medium tracking-tight text-muted">
               {persona.is_cloned ? 'Cloned' : 'Persona'}
             </span>
           </div>
@@ -42,13 +42,13 @@ export function PersonaCard({ persona, active, onSelect }: PersonaCardProps) {
         {persona.is_cloned && persona.voice_profile && (
           <div className="mb-4 grid grid-cols-2 gap-2 rounded-xl border border-border-subtle bg-canvas p-3">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted">Pitch</p>
+              <p className="text-[10px] tracking-tight text-muted">Pitch</p>
               <p className="text-xs font-medium text-accent">
                 {persona.voice_profile.characteristics.pitchRange.mean.toFixed(0)} Hz
               </p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted">Brightness</p>
+              <p className="text-[10px] tracking-tight text-muted">Brightness</p>
               <p className="text-xs font-medium text-accent">
                 {(persona.voice_profile.characteristics.brightness * 100).toFixed(0)}%
               </p>

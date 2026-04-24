@@ -214,7 +214,7 @@ export function VoiceTrainingModal({ open, persona, onClose, onUpdate }: Props) 
                   {/* Fidelity Score */}
                   <div className="border border-border-default bg-surface p-4">
                     <div className="mb-3 flex items-center justify-between">
-                      <span className="text-xs uppercase tracking-wide text-muted">Fidelity Score</span>
+                      <span className="text-xs tracking-tight text-muted">Fidelity Score</span>
                       <span className="text-sm font-medium text-primary">
                         {getFidelityLabel(status.fidelityScore)}
                       </span>
@@ -255,7 +255,7 @@ export function VoiceTrainingModal({ open, persona, onClose, onUpdate }: Props) 
                   {/* Training Samples List */}
                   {status.samples.length > 0 && (
                     <div className="border border-border-default bg-surface p-4">
-                      <h4 className="mb-3 text-xs uppercase tracking-wide text-muted">Training Samples</h4>
+                      <h4 className="mb-3 text-xs tracking-tight text-muted">Training Samples</h4>
                       <div className="max-h-40 space-y-2 overflow-y-auto">
                         {status.samples.map((sample) => (
                           <div
@@ -335,7 +335,7 @@ export function VoiceTrainingModal({ open, persona, onClose, onUpdate }: Props) 
                     <button
                       onClick={handleCalibrate}
                       disabled={calibrating}
-                      className="w-full border border-border-default bg-surface py-3 text-sm font-medium uppercase tracking-wide text-primary transition hover:bg-elevated hover:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                      className="w-full border border-border-default bg-surface py-3 text-sm font-medium tracking-tight text-primary transition hover:bg-elevated hover:border-primary disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {calibrating ? (
                         <span className="flex items-center justify-center gap-2">
@@ -358,7 +358,7 @@ export function VoiceTrainingModal({ open, persona, onClose, onUpdate }: Props) 
               <div className="flex justify-end pt-2">
                 <button
                   onClick={onClose}
-                  className="border border-border-default px-4 py-2 text-xs font-medium uppercase tracking-wide text-secondary transition hover:border-primary hover:text-primary"
+                  className="border border-border-default px-4 py-2 text-xs font-medium tracking-tight text-secondary transition hover:border-primary hover:text-primary"
                 >
                   Close
                 </button>

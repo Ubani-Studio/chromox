@@ -127,7 +127,7 @@ export function BovedaDrawer({ open, onClose, personas, onCreatePersona, onCreat
             <>
               {/* ── CREATE (left) ──────────────────────────────────── */}
               <div className="flex-1 overflow-y-auto border-r border-border-default px-6 py-4">
-                <h2 className="mb-4 text-[10px] font-medium uppercase tracking-widest text-muted">Create</h2>
+                <h2 className="mb-4 text-[10px] font-medium tracking-tight text-muted">Create</h2>
                 <div className="space-y-6">
                   <GeneratorPanel
                     onAcceptPersona={onCreatePersona ?? (async () => {})}
@@ -144,7 +144,7 @@ export function BovedaDrawer({ open, onClose, personas, onCreatePersona, onCreat
                     if (!relics || relics.length === 0) return null;
                     return (
                       <div key={persona.id}>
-                        <h3 className="mb-3 text-xs font-medium uppercase tracking-wide text-muted">
+                        <h3 className="mb-3 text-xs font-medium tracking-tight text-muted">
                           {persona.name} ({relics.length})
                         </h3>
                         <div className="space-y-3">
@@ -170,7 +170,7 @@ export function BovedaDrawer({ open, onClose, personas, onCreatePersona, onCreat
 
               {/* ── GENOME (right) ─────────────────────────────────── */}
               <div className="w-80 shrink-0 overflow-y-auto px-5 py-4">
-                <h2 className="mb-4 text-[10px] font-medium uppercase tracking-widest text-muted">Genome</h2>
+                <h2 className="mb-4 text-[10px] font-medium tracking-tight text-muted">Genome</h2>
 
                 {genome ? (
                   <div className="space-y-4">
@@ -187,7 +187,7 @@ export function BovedaDrawer({ open, onClose, personas, onCreatePersona, onCreat
                           {primary?.glyph ?? 'VOID'}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[9px] font-medium uppercase tracking-wide text-muted">
+                          <p className="text-[9px] font-medium tracking-tight text-muted">
                             {primary?.designation ?? 'NULL'} · {primary?.creativeMode ?? 'Receptive'}
                           </p>
                           <h3 className="font-display text-sm font-semibold" style={{ color: primary?.color }}>
@@ -217,7 +217,7 @@ export function BovedaDrawer({ open, onClose, personas, onCreatePersona, onCreat
                     {/* Secondary Archetype */}
                     {secondary && (
                       <div className="rounded-xl border border-border-default bg-surface p-3">
-                        <p className="text-[9px] font-medium uppercase tracking-wide text-muted">Secondary</p>
+                        <p className="text-[9px] font-medium tracking-tight text-muted">Secondary</p>
                         <div className="mt-1 flex items-center gap-2">
                           <span className="text-sm font-bold" style={{ color: secondary.color }}>
                             {secondary.glyph}
@@ -235,7 +235,7 @@ export function BovedaDrawer({ open, onClose, personas, onCreatePersona, onCreat
                     {/* Distribution Grid */}
                     {distEntries.length > 0 && (
                       <div className="rounded-xl border border-border-default bg-surface p-3">
-                        <p className="mb-2 text-[9px] font-medium uppercase tracking-wide text-muted">
+                        <p className="mb-2 text-[9px] font-medium tracking-tight text-muted">
                           Distribution
                         </p>
                         <div className="space-y-1.5">
@@ -267,7 +267,7 @@ export function BovedaDrawer({ open, onClose, personas, onCreatePersona, onCreat
                     {gam && (
                       <div className="rounded-xl border border-border-default bg-surface p-3">
                         <div className="flex items-center justify-between">
-                          <p className="text-[9px] font-medium uppercase tracking-wide text-muted">
+                          <p className="text-[9px] font-medium tracking-tight text-muted">
                             {gam.tierName}
                           </p>
                           <span className="font-mono text-xs font-semibold text-accent">
@@ -291,21 +291,21 @@ export function BovedaDrawer({ open, onClose, personas, onCreatePersona, onCreat
                         <div className="mt-2 grid grid-cols-3 gap-2 text-center">
                           <div className="rounded-lg bg-elevated p-1.5">
                             <p className="text-sm font-semibold text-primary">{gam.totalRenders}</p>
-                            <p className="text-[8px] uppercase tracking-wide text-muted">Renders</p>
+                            <p className="text-[8px] tracking-tight text-muted">Renders</p>
                           </div>
                           <div className="rounded-lg bg-elevated p-1.5">
                             <p className="text-sm font-semibold text-primary">{gam.totalLikes}</p>
-                            <p className="text-[8px] uppercase tracking-wide text-muted">Likes</p>
+                            <p className="text-[8px] tracking-tight text-muted">Likes</p>
                           </div>
                           <div className="rounded-lg bg-elevated p-1.5">
                             <p className="text-sm font-semibold text-primary">{gam.streak}</p>
-                            <p className="text-[8px] uppercase tracking-wide text-muted">Streak</p>
+                            <p className="text-[8px] tracking-tight text-muted">Streak</p>
                           </div>
                         </div>
 
                         {gam.achievements.length > 0 && (
                           <div className="mt-2">
-                            <p className="mb-1.5 text-[9px] font-medium uppercase tracking-wide text-muted">Achievements</p>
+                            <p className="mb-1.5 text-[9px] font-medium tracking-tight text-muted">Achievements</p>
                             <div className="flex flex-wrap gap-1.5">
                               {gam.achievements.map((id) => (
                                 <span
@@ -324,7 +324,7 @@ export function BovedaDrawer({ open, onClose, personas, onCreatePersona, onCreat
                     {/* Top Sonic Keywords */}
                     {genome.topKeywords.length > 0 && (
                       <div className="rounded-xl border border-border-default bg-surface p-3">
-                        <p className="mb-2 text-[9px] font-medium uppercase tracking-wide text-muted">
+                        <p className="mb-2 text-[9px] font-medium tracking-tight text-muted">
                           Sonic Keywords
                         </p>
                         <div className="flex flex-wrap gap-1.5">
@@ -349,43 +349,43 @@ export function BovedaDrawer({ open, onClose, personas, onCreatePersona, onCreat
                       genome.sonicPatterns.preferredMoods.length > 0 ||
                       genome.sonicPatterns.productionStyle.length > 0) && (
                       <div className="rounded-xl border border-border-default bg-surface p-3">
-                        <p className="mb-2 text-[9px] font-medium uppercase tracking-wide text-muted">
+                        <p className="mb-2 text-[9px] font-medium tracking-tight text-muted">
                           Sonic Patterns
                         </p>
                         <div className="space-y-2">
                           {genome.sonicPatterns.dominantTextures.length > 0 && (
                             <div>
-                              <p className="text-[8px] uppercase tracking-wide text-muted">Textures</p>
+                              <p className="text-[8px] tracking-tight text-muted">Textures</p>
                               <p className="text-xs text-primary">{genome.sonicPatterns.dominantTextures.join(', ')}</p>
                             </div>
                           )}
                           {genome.sonicPatterns.preferredMoods.length > 0 && (
                             <div>
-                              <p className="text-[8px] uppercase tracking-wide text-muted">Moods</p>
+                              <p className="text-[8px] tracking-tight text-muted">Moods</p>
                               <p className="text-xs text-primary">{genome.sonicPatterns.preferredMoods.join(', ')}</p>
                             </div>
                           )}
                           {genome.sonicPatterns.productionStyle.length > 0 && (
                             <div>
-                              <p className="text-[8px] uppercase tracking-wide text-muted">Production</p>
+                              <p className="text-[8px] tracking-tight text-muted">Production</p>
                               <p className="text-xs text-primary">{genome.sonicPatterns.productionStyle.join(', ')}</p>
                             </div>
                           )}
                           {genome.sonicPatterns.vocalPreference.length > 0 && (
                             <div>
-                              <p className="text-[8px] uppercase tracking-wide text-muted">Vocal</p>
+                              <p className="text-[8px] tracking-tight text-muted">Vocal</p>
                               <p className="text-xs text-primary">{genome.sonicPatterns.vocalPreference.join(', ')}</p>
                             </div>
                           )}
                           {genome.sonicPatterns.spatialPreference.length > 0 && (
                             <div>
-                              <p className="text-[8px] uppercase tracking-wide text-muted">Space</p>
+                              <p className="text-[8px] tracking-tight text-muted">Space</p>
                               <p className="text-xs text-primary">{genome.sonicPatterns.spatialPreference.join(', ')}</p>
                             </div>
                           )}
                           {genome.sonicPatterns.avoidTextures.length > 0 && (
                             <div>
-                              <p className="text-[8px] uppercase tracking-wide text-muted">Avoid</p>
+                              <p className="text-[8px] tracking-tight text-muted">Avoid</p>
                               <p className="text-xs text-error">{genome.sonicPatterns.avoidTextures.join(', ')}</p>
                             </div>
                           )}
@@ -396,16 +396,16 @@ export function BovedaDrawer({ open, onClose, personas, onCreatePersona, onCreat
                     {/* Exploration */}
                     {gam && (gam.uniqueEffects.length > 0 || gam.uniqueGuides.length > 0) && (
                       <div className="rounded-xl border border-border-default bg-surface p-3">
-                        <p className="mb-2 text-[9px] font-medium uppercase tracking-wide text-muted">
+                        <p className="mb-2 text-[9px] font-medium tracking-tight text-muted">
                           Exploration
                         </p>
                         <div className="grid grid-cols-2 gap-2">
                           <div className="rounded-lg bg-elevated p-2">
-                            <p className="text-[9px] uppercase tracking-wide text-muted">Effects</p>
+                            <p className="text-[9px] tracking-tight text-muted">Effects</p>
                             <p className="text-lg font-semibold text-primary">{gam.uniqueEffects.length}</p>
                           </div>
                           <div className="rounded-lg bg-elevated p-2">
-                            <p className="text-[9px] uppercase tracking-wide text-muted">Guides</p>
+                            <p className="text-[9px] tracking-tight text-muted">Guides</p>
                             <p className="text-lg font-semibold text-primary">{gam.uniqueGuides.length}</p>
                           </div>
                         </div>

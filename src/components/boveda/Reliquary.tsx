@@ -37,7 +37,7 @@ export function Reliquary({ packs, onUnlock }: Props) {
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <ShieldIcon size={16} className="text-accent" />
-        <h3 className="text-sm font-medium uppercase tracking-wide text-secondary">
+        <h3 className="text-sm font-medium tracking-tight text-secondary">
           Reliquary
         </h3>
       </div>
@@ -70,7 +70,7 @@ export function Reliquary({ packs, onUnlock }: Props) {
               ) : (
                 <button
                   onClick={() => setActivePackId(activePackId === pack.id ? null : pack.id)}
-                  className="rounded-lg border border-border-default px-3 py-1.5 text-[11px] font-medium uppercase tracking-wide text-secondary transition hover:border-border-emphasis hover:text-primary"
+                  className="rounded-lg border border-border-default px-3 py-1.5 text-[11px] font-medium tracking-tight text-secondary transition hover:border-border-emphasis hover:text-primary"
                 >
                   {activePackId === pack.id ? 'Cancel' : 'Unlock'}
                 </button>
@@ -96,7 +96,7 @@ export function Reliquary({ packs, onUnlock }: Props) {
                   <button
                     onClick={() => handleUnlock(pack.id)}
                     disabled={unlocking || !password.trim()}
-                    className="rounded-lg bg-accent px-4 py-2 text-xs font-medium uppercase tracking-wide text-canvas transition hover:bg-accent-hover disabled:opacity-40"
+                    className="rounded-lg bg-accent px-4 py-2 text-xs font-medium tracking-tight text-canvas transition hover:bg-accent-hover disabled:opacity-40"
                   >
                     {unlocking ? 'Checking...' : 'Submit'}
                   </button>

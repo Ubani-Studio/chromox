@@ -55,7 +55,7 @@ export function GuideDropzone({ onFile }: Props) {
       ) : (
         <div>
           <p className="text-sm font-medium text-secondary">Drop guide vocal or click</p>
-          <p className="mt-1 text-xs uppercase tracking-wider text-muted">WAV · MP3 · AIFF</p>
+          <p className="mt-1 text-xs tracking-tight text-muted">WAV · MP3 · AIFF</p>
         </div>
       )}
     </div>

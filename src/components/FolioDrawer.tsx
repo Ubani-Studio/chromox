@@ -276,7 +276,7 @@ export function FolioDrawer({
                 <button
                   onClick={handleUpload}
                   disabled={uploading}
-                  className="rounded-lg bg-accent px-4 py-2 text-xs font-medium uppercase tracking-wider text-canvas transition hover:bg-accent-hover disabled:opacity-50"
+                  className="rounded-lg bg-accent px-4 py-2 text-xs font-medium tracking-tight text-canvas transition hover:bg-accent-hover disabled:opacity-50"
                 >
                   {uploading ? 'Uploading...' : 'Add'}
                 </button>
@@ -371,7 +371,7 @@ export function FolioDrawer({
               {/* Group header */}
               {group.label && (
                 <div className="mb-3 flex items-center gap-3">
-                  <p className="text-xs font-medium uppercase tracking-wider text-muted">{group.label}</p>
+                  <p className="text-xs font-medium tracking-tight text-muted">{group.label}</p>
                   <span className="rounded-full bg-elevated px-2 py-0.5 text-[10px] text-secondary">{group.clips.length}</span>
                   <div className="h-px flex-1 bg-border-default" />
                 </div>
@@ -393,7 +393,7 @@ export function FolioDrawer({
                     >
                       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                         <div>
-                          <p className="text-xs uppercase tracking-wider text-muted">
+                          <p className="text-xs tracking-tight text-muted">
                             {clip.sourcePersonaName || (isGuide ? 'Guide' : clip.source === 'render' ? 'Render' : 'Upload')}
                           </p>
                           <h3 className="font-display text-lg font-medium">{clip.name}</h3>
@@ -402,7 +402,7 @@ export function FolioDrawer({
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleUseAndClose(clip.id)}
-                            className={`rounded-lg px-4 py-2 text-xs font-medium uppercase tracking-wider transition ${
+                            className={`rounded-lg px-4 py-2 text-xs font-medium tracking-tight transition ${
                               isSelected
                                 ? 'bg-accent text-canvas'
                                 : 'border border-border-default bg-surface text-secondary hover:bg-overlay hover:border-border-emphasis'
@@ -421,7 +421,7 @@ export function FolioDrawer({
                                 }
                               }}
                               disabled={removingId === clip.id}
-                              className="rounded-lg border border-border-default px-4 py-2 text-xs font-medium uppercase tracking-wider text-secondary transition hover:border-error/40 hover:text-error disabled:opacity-50"
+                              className="rounded-lg border border-border-default px-4 py-2 text-xs font-medium tracking-tight text-secondary transition hover:border-error/40 hover:text-error disabled:opacity-50"
                             >
                               <TrashIcon size={12} />
                             </button>

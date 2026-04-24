@@ -34,7 +34,7 @@ export function RelicCard({ relic, variant = 'generated' }: Props) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <h4 className="truncate text-sm font-medium text-primary">{relic.name}</h4>
-            <span className={`shrink-0 rounded-md px-2 py-0.5 text-[9px] font-medium uppercase tracking-wide ${
+            <span className={`shrink-0 rounded-md px-2 py-0.5 text-[9px] font-medium tracking-tight ${
               relic.tier >= 3 ? 'bg-yellow-500/15 text-yellow-500' :
               relic.tier >= 2 ? 'bg-accent/15 text-accent' :
               'bg-elevated text-muted'

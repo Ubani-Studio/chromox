@@ -133,7 +133,7 @@ export function EditPersonaModal({ open, persona, onClose, onSubmit }: Props) {
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <Dialog.Title className="font-display text-xl font-semibold">Edit Persona</Dialog.Title>
             <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted">
+              <label className="flex items-center gap-2 text-[11px] tracking-tight text-muted">
                 <input
                   type="checkbox"
                   checked={useMononym}
@@ -146,7 +146,7 @@ export function EditPersonaModal({ open, persona, onClose, onSubmit }: Props) {
                 type="button"
                 onClick={handleRandomize}
                 disabled={!persona || randomizing}
-                className="rounded-md border border-border-default px-3 py-1.5 text-[11px] font-medium uppercase tracking-wide text-secondary transition hover:border-border-emphasis disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-md border border-border-default px-3 py-1.5 text-[11px] font-medium tracking-tight text-secondary transition hover:border-border-emphasis disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {randomizing ? 'Weaving...' : 'AI Randomize'}
               </button>
@@ -155,7 +155,7 @@ export function EditPersonaModal({ open, persona, onClose, onSubmit }: Props) {
           {persona ? (
             <div className="space-y-4 text-sm text-secondary">
               <label className="block">
-                <span className="text-xs uppercase tracking-wide text-muted">Name</span>
+                <span className="text-xs tracking-tight text-muted">Name</span>
                 <input
                   className="mt-1 w-full rounded-lg border border-border-default bg-surface px-3 py-2 text-sm text-primary focus:border-accent focus:outline-none"
                   value={name}
@@ -163,7 +163,7 @@ export function EditPersonaModal({ open, persona, onClose, onSubmit }: Props) {
                 />
               </label>
               <label className="block">
-                <span className="text-xs uppercase tracking-wide text-muted">Description</span>
+                <span className="text-xs tracking-tight text-muted">Description</span>
                 <textarea
                   className="mt-1 w-full rounded-lg border border-border-default bg-surface px-3 py-2 text-sm text-primary focus:border-accent focus:outline-none"
                   rows={3}
@@ -172,23 +172,25 @@ export function EditPersonaModal({ open, persona, onClose, onSubmit }: Props) {
                 />
               </label>
               <label className="block">
-                <span className="text-xs uppercase tracking-wide text-muted">Provider</span>
+                <span className="text-xs tracking-tight text-muted">Provider</span>
                 <select
                   className="mt-1 w-full rounded-lg border border-border-default bg-surface px-3 py-2 text-sm text-primary focus:border-accent focus:outline-none"
                   value={provider}
                   onChange={(e) => setProvider(e.target.value)}
                 >
+                  <option value="so-vits">So-VITS-SVC (Best Voice Match)</option>
+                  <option value="ddsp">DDSP-SVC (Fast)</option>
+                  <option value="rvc">RVC (Spectral Transfer)</option>
                   <option value="camb-ai">CAMB.AI MARS8 (Ultra Clone)</option>
                   <option value="elevenlabs">ElevenLabs</option>
                   <option value="fish-audio">Fish Audio</option>
                   <option value="minimax">MiniMax Audio</option>
                   <option value="kits-ai">Kits AI</option>
-                  <option value="rvc">RVC (Open Source)</option>
                   <option value="openai-voice">OpenAI Voice</option>
                 </select>
               </label>
               <label className="block">
-                <span className="text-xs uppercase tracking-wide text-muted">Voice Model Key</span>
+                <span className="text-xs tracking-tight text-muted">Voice Model Key</span>
                 <input
                   className="mt-1 w-full rounded-lg border border-border-default bg-surface px-3 py-2 text-sm text-primary focus:border-accent focus:outline-none"
                   value={voiceKey}
@@ -196,7 +198,7 @@ export function EditPersonaModal({ open, persona, onClose, onSubmit }: Props) {
                 />
               </label>
               <div>
-                <p className="text-xs uppercase tracking-wide text-muted">Portrait</p>
+                <p className="text-xs tracking-tight text-muted">Portrait</p>
                 {/* Drag & Drop Zone */}
                 <div
                   ref={dropzoneRef}
@@ -271,7 +273,7 @@ export function EditPersonaModal({ open, persona, onClose, onSubmit }: Props) {
                             e.stopPropagation();
                             fileInputRef.current?.click();
                           }}
-                          className="border border-border-default px-3 py-2 text-[11px] font-medium uppercase tracking-wide text-secondary transition hover:border-border-emphasis"
+                          className="border border-border-default px-3 py-2 text-[11px] font-medium tracking-tight text-secondary transition hover:border-border-emphasis"
                         >
                           Replace
                         </button>
@@ -282,7 +284,7 @@ export function EditPersonaModal({ open, persona, onClose, onSubmit }: Props) {
                             setImage(null);
                             if (!persona?.image_url) setPreview(null);
                           }}
-                          className="border border-border-subtle px-3 py-2 text-[11px] font-medium uppercase tracking-wide text-muted transition hover:border-border-default hover:text-secondary"
+                          className="border border-border-subtle px-3 py-2 text-[11px] font-medium tracking-tight text-muted transition hover:border-border-default hover:text-secondary"
                         >
                           Remove
                         </button>
@@ -312,14 +314,14 @@ export function EditPersonaModal({ open, persona, onClose, onSubmit }: Props) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="rounded-lg border border-border-default px-4 py-2 text-xs font-medium uppercase tracking-wide text-secondary transition hover:border-border-emphasis"
+                  className="rounded-lg border border-border-default px-4 py-2 text-xs font-medium tracking-tight text-secondary transition hover:border-border-emphasis"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  className="rounded-lg bg-accent px-4 py-2 text-xs font-medium uppercase tracking-wide text-canvas transition hover:bg-accent-hover"
+                  className="rounded-lg bg-accent px-4 py-2 text-xs font-medium tracking-tight text-canvas transition hover:bg-accent-hover"
                 >
                   Save Changes
                 </button>

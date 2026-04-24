@@ -103,7 +103,7 @@ export function BovedaTab({ personas, onCreatePersona, onCreateRelic }: Props) {
         </div>
         <button
           onClick={() => loadData()}
-          className="rounded-xl border border-border-default bg-surface px-4 py-2 text-sm font-medium uppercase tracking-wider text-secondary transition hover:bg-overlay hover:border-border-emphasis"
+          className="rounded-xl border border-border-default bg-surface px-4 py-2 text-sm font-medium tracking-tight text-secondary transition hover:bg-overlay hover:border-border-emphasis"
         >
           Refresh
         </button>
@@ -120,7 +120,7 @@ export function BovedaTab({ personas, onCreatePersona, onCreateRelic }: Props) {
           {/* ── CREATE (left, 2 cols) ──────────────────────────────────── */}
           <div className="lg:col-span-2 space-y-6">
             <div className="rounded-2xl border border-border-default bg-surface p-5">
-              <h2 className="mb-4 text-xs font-medium uppercase tracking-widest text-muted">Create</h2>
+              <h2 className="mb-4 text-xs font-medium tracking-tight text-muted">Create</h2>
               <GeneratorPanel
                 onAcceptPersona={onCreatePersona ?? (async () => {})}
                 onAcceptRelic={onCreateRelic ? async (personaId, relic) => {
@@ -137,7 +137,7 @@ export function BovedaTab({ personas, onCreatePersona, onCreateRelic }: Props) {
               if (!relics || relics.length === 0) return null;
               return (
                 <div key={persona.id} className="rounded-2xl border border-border-default bg-surface p-5">
-                  <h3 className="mb-4 text-xs font-medium uppercase tracking-widest text-muted">
+                  <h3 className="mb-4 text-xs font-medium tracking-tight text-muted">
                     {persona.name} ({relics.length} relic{relics.length !== 1 ? 's' : ''})
                   </h3>
                   <div className="grid gap-4 md:grid-cols-2">
@@ -162,7 +162,7 @@ export function BovedaTab({ personas, onCreatePersona, onCreateRelic }: Props) {
 
           {/* ── GENOME (right, 1 col) ─────────────────────────────────── */}
           <div className="space-y-4">
-            <h2 className="text-xs font-medium uppercase tracking-widest text-muted">Genome</h2>
+            <h2 className="text-xs font-medium tracking-tight text-muted">Genome</h2>
 
             {genome ? (
               <>
@@ -179,7 +179,7 @@ export function BovedaTab({ personas, onCreatePersona, onCreateRelic }: Props) {
                       {primary?.glyph ?? 'VOID'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[9px] font-medium uppercase tracking-wide text-muted">
+                      <p className="text-[9px] font-medium tracking-tight text-muted">
                         {primary?.designation ?? 'NULL'} · {primary?.creativeMode ?? 'Receptive'}
                       </p>
                       <h3 className="font-display text-sm font-semibold" style={{ color: primary?.color }}>
@@ -209,7 +209,7 @@ export function BovedaTab({ personas, onCreatePersona, onCreateRelic }: Props) {
                 {/* Secondary Archetype */}
                 {secondary && (
                   <div className="rounded-2xl border border-border-default bg-surface p-4">
-                    <p className="text-[9px] font-medium uppercase tracking-wide text-muted">Secondary</p>
+                    <p className="text-[9px] font-medium tracking-tight text-muted">Secondary</p>
                     <div className="mt-1 flex items-center gap-2">
                       <span className="text-sm font-bold" style={{ color: secondary.color }}>
                         {secondary.glyph}
@@ -227,7 +227,7 @@ export function BovedaTab({ personas, onCreatePersona, onCreateRelic }: Props) {
                 {/* Distribution Grid */}
                 {distEntries.length > 0 && (
                   <div className="rounded-2xl border border-border-default bg-surface p-4">
-                    <p className="mb-3 text-[9px] font-medium uppercase tracking-wide text-muted">
+                    <p className="mb-3 text-[9px] font-medium tracking-tight text-muted">
                       Distribution
                     </p>
                     <div className="space-y-2">
@@ -259,7 +259,7 @@ export function BovedaTab({ personas, onCreatePersona, onCreateRelic }: Props) {
                 {gam && (
                   <div className="rounded-2xl border border-border-default bg-surface p-4">
                     <div className="flex items-center justify-between">
-                      <p className="text-[9px] font-medium uppercase tracking-wide text-muted">
+                      <p className="text-[9px] font-medium tracking-tight text-muted">
                         {gam.tierName}
                       </p>
                       <span className="font-mono text-xs font-semibold text-accent">
@@ -283,21 +283,21 @@ export function BovedaTab({ personas, onCreatePersona, onCreateRelic }: Props) {
                     <div className="mt-3 grid grid-cols-3 gap-2 text-center">
                       <div className="rounded-xl bg-elevated p-2">
                         <p className="text-sm font-semibold text-primary">{gam.totalRenders}</p>
-                        <p className="text-[8px] uppercase tracking-wide text-muted">Renders</p>
+                        <p className="text-[8px] tracking-tight text-muted">Renders</p>
                       </div>
                       <div className="rounded-xl bg-elevated p-2">
                         <p className="text-sm font-semibold text-primary">{gam.totalLikes}</p>
-                        <p className="text-[8px] uppercase tracking-wide text-muted">Likes</p>
+                        <p className="text-[8px] tracking-tight text-muted">Likes</p>
                       </div>
                       <div className="rounded-xl bg-elevated p-2">
                         <p className="text-sm font-semibold text-primary">{gam.streak}</p>
-                        <p className="text-[8px] uppercase tracking-wide text-muted">Streak</p>
+                        <p className="text-[8px] tracking-tight text-muted">Streak</p>
                       </div>
                     </div>
 
                     {gam.achievements.length > 0 && (
                       <div className="mt-3">
-                        <p className="mb-2 text-[9px] font-medium uppercase tracking-wide text-muted">Achievements</p>
+                        <p className="mb-2 text-[9px] font-medium tracking-tight text-muted">Achievements</p>
                         <div className="flex flex-wrap gap-1.5">
                           {gam.achievements.map((id) => (
                             <span
@@ -316,7 +316,7 @@ export function BovedaTab({ personas, onCreatePersona, onCreateRelic }: Props) {
                 {/* Top Sonic Keywords */}
                 {genome.topKeywords.length > 0 && (
                   <div className="rounded-2xl border border-border-default bg-surface p-4">
-                    <p className="mb-3 text-[9px] font-medium uppercase tracking-wide text-muted">
+                    <p className="mb-3 text-[9px] font-medium tracking-tight text-muted">
                       Sonic Keywords
                     </p>
                     <div className="flex flex-wrap gap-1.5">
@@ -341,43 +341,43 @@ export function BovedaTab({ personas, onCreatePersona, onCreateRelic }: Props) {
                   genome.sonicPatterns.preferredMoods.length > 0 ||
                   genome.sonicPatterns.productionStyle.length > 0) && (
                   <div className="rounded-2xl border border-border-default bg-surface p-4">
-                    <p className="mb-3 text-[9px] font-medium uppercase tracking-wide text-muted">
+                    <p className="mb-3 text-[9px] font-medium tracking-tight text-muted">
                       Sonic Patterns
                     </p>
                     <div className="space-y-2">
                       {genome.sonicPatterns.dominantTextures.length > 0 && (
                         <div>
-                          <p className="text-[8px] uppercase tracking-wide text-muted">Textures</p>
+                          <p className="text-[8px] tracking-tight text-muted">Textures</p>
                           <p className="text-xs text-primary">{genome.sonicPatterns.dominantTextures.join(', ')}</p>
                         </div>
                       )}
                       {genome.sonicPatterns.preferredMoods.length > 0 && (
                         <div>
-                          <p className="text-[8px] uppercase tracking-wide text-muted">Moods</p>
+                          <p className="text-[8px] tracking-tight text-muted">Moods</p>
                           <p className="text-xs text-primary">{genome.sonicPatterns.preferredMoods.join(', ')}</p>
                         </div>
                       )}
                       {genome.sonicPatterns.productionStyle.length > 0 && (
                         <div>
-                          <p className="text-[8px] uppercase tracking-wide text-muted">Production</p>
+                          <p className="text-[8px] tracking-tight text-muted">Production</p>
                           <p className="text-xs text-primary">{genome.sonicPatterns.productionStyle.join(', ')}</p>
                         </div>
                       )}
                       {genome.sonicPatterns.vocalPreference.length > 0 && (
                         <div>
-                          <p className="text-[8px] uppercase tracking-wide text-muted">Vocal</p>
+                          <p className="text-[8px] tracking-tight text-muted">Vocal</p>
                           <p className="text-xs text-primary">{genome.sonicPatterns.vocalPreference.join(', ')}</p>
                         </div>
                       )}
                       {genome.sonicPatterns.spatialPreference.length > 0 && (
                         <div>
-                          <p className="text-[8px] uppercase tracking-wide text-muted">Space</p>
+                          <p className="text-[8px] tracking-tight text-muted">Space</p>
                           <p className="text-xs text-primary">{genome.sonicPatterns.spatialPreference.join(', ')}</p>
                         </div>
                       )}
                       {genome.sonicPatterns.avoidTextures.length > 0 && (
                         <div>
-                          <p className="text-[8px] uppercase tracking-wide text-muted">Avoid</p>
+                          <p className="text-[8px] tracking-tight text-muted">Avoid</p>
                           <p className="text-xs text-error">{genome.sonicPatterns.avoidTextures.join(', ')}</p>
                         </div>
                       )}
@@ -388,16 +388,16 @@ export function BovedaTab({ personas, onCreatePersona, onCreateRelic }: Props) {
                 {/* Exploration */}
                 {gam && (gam.uniqueEffects.length > 0 || gam.uniqueGuides.length > 0) && (
                   <div className="rounded-2xl border border-border-default bg-surface p-4">
-                    <p className="mb-3 text-[9px] font-medium uppercase tracking-wide text-muted">
+                    <p className="mb-3 text-[9px] font-medium tracking-tight text-muted">
                       Exploration
                     </p>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="rounded-xl bg-elevated p-3">
-                        <p className="text-[9px] uppercase tracking-wide text-muted">Effects</p>
+                        <p className="text-[9px] tracking-tight text-muted">Effects</p>
                         <p className="text-lg font-semibold text-primary">{gam.uniqueEffects.length}</p>
                       </div>
                       <div className="rounded-xl bg-elevated p-3">
-                        <p className="text-[9px] uppercase tracking-wide text-muted">Guides</p>
+                        <p className="text-[9px] tracking-tight text-muted">Guides</p>
                         <p className="text-lg font-semibold text-primary">{gam.uniqueGuides.length}</p>
                       </div>
                     </div>

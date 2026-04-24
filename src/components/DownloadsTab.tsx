@@ -260,7 +260,7 @@ export function DownloadsTab({
         </div>
         <button
           onClick={() => refreshJobs()}
-          className="rounded-xl border border-border-default bg-surface px-4 py-2 text-sm font-medium uppercase tracking-wider text-secondary transition hover:bg-overlay hover:border-border-emphasis"
+          className="rounded-xl border border-border-default bg-surface px-4 py-2 text-sm font-medium tracking-tight text-secondary transition hover:bg-overlay hover:border-border-emphasis"
         >
           Refresh
         </button>
@@ -336,7 +336,7 @@ export function DownloadsTab({
                   size={14}
                   className={`text-muted transition-transform ${isCollapsed ? '-rotate-90' : ''}`}
                 />
-                <p className="text-xs font-medium uppercase tracking-wider text-muted">{group.label}</p>
+                <p className="text-xs font-medium tracking-tight text-muted">{group.label}</p>
                 <span className="rounded-full bg-elevated px-2 py-0.5 text-[10px] text-secondary">{group.jobs.length}</span>
                 <div className="h-px flex-1 bg-border-default" />
               </button>
@@ -356,7 +356,7 @@ export function DownloadsTab({
                     <select
                       value={selectedNewPersonaId || job.personaId}
                       onChange={(e) => setSelectedNewPersonaId(e.target.value)}
-                      className="min-w-0 flex-1 truncate rounded border border-accent bg-canvas px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-primary outline-none focus:ring-1 focus:ring-accent"
+                      className="min-w-0 flex-1 truncate rounded border border-accent bg-canvas px-1.5 py-0.5 text-[10px] tracking-tight text-primary outline-none focus:ring-1 focus:ring-accent"
                     >
                       {personas.map((p) => (
                         <option key={p.id} value={p.id}>{p.name}</option>
@@ -386,7 +386,7 @@ export function DownloadsTab({
                   </div>
                 ) : (
                   <p
-                    className="text-[10px] uppercase tracking-wider text-muted cursor-pointer hover:text-accent transition"
+                    className="text-[10px] tracking-tight text-muted cursor-pointer hover:text-accent transition"
                     onClick={() => { setEditingPersonaId(job.id); setSelectedNewPersonaId(job.personaId); }}
                     title="Click to change persona"
                   >
@@ -498,13 +498,13 @@ export function DownloadsTab({
                 <a
                   href={`${job.audioUrl.startsWith('http') ? job.audioUrl : `${API_HOST}${job.audioUrl}`}`}
                   download
-                  className="flex-1 rounded-lg bg-accent px-2 py-1.5 text-center text-[10px] font-medium uppercase tracking-wider text-canvas transition hover:bg-accent-hover"
+                  className="flex-1 rounded-lg bg-accent px-2 py-1.5 text-center text-[10px] font-medium tracking-tight text-canvas transition hover:bg-accent-hover"
                 >
                   Download
                 </a>
                 <button
                   onClick={() => onSelectJob(job)}
-                  className="flex-1 rounded-lg border border-border-default bg-surface px-2 py-1.5 text-[10px] font-medium uppercase tracking-wider text-secondary transition hover:bg-overlay"
+                  className="flex-1 rounded-lg border border-border-default bg-surface px-2 py-1.5 text-[10px] font-medium tracking-tight text-secondary transition hover:bg-overlay"
                 >
                   Load
                 </button>
@@ -519,7 +519,7 @@ export function DownloadsTab({
                     }
                   }}
                   disabled={busyId === job.id}
-                  className="flex-1 rounded-lg border border-border-default px-2 py-1.5 text-[10px] font-medium uppercase tracking-wider text-secondary transition hover:bg-overlay disabled:opacity-50"
+                  className="flex-1 rounded-lg border border-border-default px-2 py-1.5 text-[10px] font-medium tracking-tight text-secondary transition hover:bg-overlay disabled:opacity-50"
                 >
                   {busyId === job.id ? '...' : 'Reprint'}
                 </button>

@@ -204,7 +204,7 @@ export function VoiceCloneModal({ open, onClose, onPersonaCreated }: Props) {
                   <div className="text-center">
                     <UploadIcon className="mx-auto mb-4 text-muted" size={48} />
                     <p className="text-base font-medium text-secondary">Drop vocal stem or click to browse</p>
-                    <p className="mt-3 text-xs uppercase tracking-wide text-muted">
+                    <p className="mt-3 text-xs tracking-tight text-muted">
                       WAV · AIFF · MP3 · FLAC
                     </p>
                   </div>
@@ -221,11 +221,11 @@ export function VoiceCloneModal({ open, onClose, onPersonaCreated }: Props) {
                     <div className="mb-4 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-2 bg-accent" />
-                        <p className="text-sm font-medium uppercase tracking-wider">
+                        <p className="text-sm font-medium tracking-tight">
                           Auto-Detected
                         </p>
                       </div>
-                      <span className="border border-border-default px-3 py-1 text-xs font-medium uppercase tracking-wide">
+                      <span className="border border-border-default px-3 py-1 text-xs font-medium tracking-tight">
                         {analysis.detection.modeLabel}
                       </span>
                     </div>
@@ -233,7 +233,7 @@ export function VoiceCloneModal({ open, onClose, onPersonaCreated }: Props) {
                     {/* Detection Grid */}
                     <div className="grid grid-cols-3 gap-3">
                       <div className="border border-border-subtle bg-canvas p-3">
-                        <p className="text-[10px] uppercase tracking-wider text-muted">Voice Type</p>
+                        <p className="text-[10px] tracking-tight text-muted">Voice Type</p>
                         <p className="mt-1 text-sm font-semibold capitalize">
                           {analysis.detection.voiceType}
                         </p>
@@ -242,7 +242,7 @@ export function VoiceCloneModal({ open, onClose, onPersonaCreated }: Props) {
                         </p>
                       </div>
                       <div className="border border-border-subtle bg-canvas p-3">
-                        <p className="text-[10px] uppercase tracking-wider text-muted">Accent</p>
+                        <p className="text-[10px] tracking-tight text-muted">Accent</p>
                         <p className="mt-1 text-sm font-semibold">
                           {analysis.detection.accentLabel}
                         </p>
@@ -251,7 +251,7 @@ export function VoiceCloneModal({ open, onClose, onPersonaCreated }: Props) {
                         </p>
                       </div>
                       <div className="border border-border-subtle bg-canvas p-3">
-                        <p className="text-[10px] uppercase tracking-wider text-muted">Quality</p>
+                        <p className="text-[10px] tracking-tight text-muted">Quality</p>
                         <p className="mt-1 text-sm font-semibold capitalize">
                           {analysis.detection.audioQuality}
                         </p>
@@ -265,8 +265,8 @@ export function VoiceCloneModal({ open, onClose, onPersonaCreated }: Props) {
                     <div className="mt-4 border-t border-border-subtle pt-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-[10px] uppercase tracking-wider text-muted">Recommended Provider</p>
-                          <p className="mt-1 text-sm font-semibold uppercase">
+                          <p className="text-[10px] tracking-tight text-muted">Recommended Provider</p>
+                          <p className="mt-1 text-sm font-semibold">
                             {analysis.detection.recommendedProvider}
                           </p>
                         </div>
@@ -280,31 +280,31 @@ export function VoiceCloneModal({ open, onClose, onPersonaCreated }: Props) {
 
                 {/* Voice Characteristics */}
                 <div className="border border-border-default bg-surface p-5">
-                  <p className="mb-4 text-sm font-medium uppercase tracking-wider text-muted">
+                  <p className="mb-4 text-sm font-medium tracking-tight text-muted">
                     Voice Characteristics
                   </p>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="border border-border-subtle bg-canvas p-3">
-                      <p className="text-[10px] uppercase tracking-wider text-muted">Pitch Range</p>
+                      <p className="text-[10px] tracking-tight text-muted">Pitch Range</p>
                       <p className="mt-1 text-lg font-semibold">
                         {analysis.profile.characteristics.pitchRange.min.toFixed(0)} -{' '}
                         {analysis.profile.characteristics.pitchRange.max.toFixed(0)} Hz
                       </p>
                     </div>
                     <div className="border border-border-subtle bg-canvas p-3">
-                      <p className="text-[10px] uppercase tracking-wider text-muted">Brightness</p>
+                      <p className="text-[10px] tracking-tight text-muted">Brightness</p>
                       <p className="mt-1 text-lg font-semibold">
                         {(analysis.profile.characteristics.brightness * 100).toFixed(0)}%
                       </p>
                     </div>
                     <div className="border border-border-subtle bg-canvas p-3">
-                      <p className="text-[10px] uppercase tracking-wider text-muted">Breathiness</p>
+                      <p className="text-[10px] tracking-tight text-muted">Breathiness</p>
                       <p className="mt-1 text-lg font-semibold">
                         {(analysis.profile.characteristics.breathiness * 100).toFixed(0)}%
                       </p>
                     </div>
                     <div className="border border-border-subtle bg-canvas p-3">
-                      <p className="text-[10px] uppercase tracking-wider text-muted">Vibrato</p>
+                      <p className="text-[10px] tracking-tight text-muted">Vibrato</p>
                       <p className="mt-1 text-lg font-semibold">
                         {analysis.profile.characteristics.vibratoRate.toFixed(1)} Hz
                       </p>
@@ -352,7 +352,7 @@ export function VoiceCloneModal({ open, onClose, onPersonaCreated }: Props) {
                   <button
                     type="button"
                     onClick={() => imageInputRef.current?.click()}
-                    className="rounded-lg border border-border-default px-4 py-2 text-xs font-medium uppercase tracking-wide text-secondary transition hover:border-border-emphasis hover:text-primary"
+                    className="rounded-lg border border-border-default px-4 py-2 text-xs font-medium tracking-tight text-secondary transition hover:border-border-emphasis hover:text-primary"
                   >
                     Upload
                   </button>
@@ -360,7 +360,7 @@ export function VoiceCloneModal({ open, onClose, onPersonaCreated }: Props) {
                     <button
                       type="button"
                       onClick={() => setPersonaImage(null)}
-                      className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-medium uppercase tracking-wide text-muted transition hover:border-border-default hover:text-secondary"
+                      className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-medium tracking-tight text-muted transition hover:border-border-default hover:text-secondary"
                     >
                       Clear
                     </button>
@@ -392,7 +392,7 @@ export function VoiceCloneModal({ open, onClose, onPersonaCreated }: Props) {
                 <button
                   onClick={handleAnalyze}
                   disabled={!vocalFile || analyzing}
-                  className="flex-1 rounded-xl border border-border-default bg-elevated px-6 py-3.5 text-sm font-medium uppercase tracking-wider transition hover:bg-overlay hover:border-border-emphasis disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex-1 rounded-xl border border-border-default bg-elevated px-6 py-3.5 text-sm font-medium tracking-tight transition hover:bg-overlay hover:border-border-emphasis disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {analyzing ? 'Analyzing Voice...' : 'Analyze Voice'}
                 </button>
@@ -400,7 +400,7 @@ export function VoiceCloneModal({ open, onClose, onPersonaCreated }: Props) {
                 <button
                   onClick={handleCreatePersona}
                   disabled={!name || creating}
-                  className="flex-1 rounded-xl bg-accent px-6 py-3.5 text-sm font-medium uppercase tracking-wider text-canvas transition hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex-1 rounded-xl bg-accent px-6 py-3.5 text-sm font-medium tracking-tight text-canvas transition hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {creating ? 'Cloning Voice...' : 'Clone & Save Persona'}
                 </button>
@@ -410,7 +410,7 @@ export function VoiceCloneModal({ open, onClose, onPersonaCreated }: Props) {
                   resetForm();
                   onClose();
                 }}
-                className="rounded-xl border border-border-default px-6 py-3.5 text-sm font-medium uppercase tracking-wider text-secondary transition hover:bg-overlay hover:text-primary"
+                className="rounded-xl border border-border-default px-6 py-3.5 text-sm font-medium tracking-tight text-secondary transition hover:bg-overlay hover:text-primary"
               >
                 Cancel
               </button>

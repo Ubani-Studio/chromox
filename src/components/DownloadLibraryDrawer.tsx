@@ -106,7 +106,7 @@ export function DownloadLibraryDrawer({
           </select>
           <button
             onClick={() => refreshJobs()}
-            className="rounded-xl border border-border-default bg-surface px-3 py-2 text-sm font-medium uppercase tracking-wider text-secondary transition hover:bg-overlay hover:border-border-emphasis"
+            className="rounded-xl border border-border-default bg-surface px-3 py-2 text-sm font-medium tracking-tight text-secondary transition hover:bg-overlay hover:border-border-emphasis"
           >
             Refresh
           </button>
@@ -120,7 +120,7 @@ export function DownloadLibraryDrawer({
               <div key={job.id} className="rounded-2xl border border-border-default bg-surface p-4">
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-wider text-muted">{job.personaName}</p>
+                  <p className="text-xs tracking-tight text-muted">{job.personaName}</p>
                   <h3 className="font-display text-lg font-medium">{job.label || 'Untitled Session'}</h3>
                   <p className="text-xs text-muted">{new Date(job.created_at).toLocaleString()}</p>
                 </div>
@@ -128,13 +128,13 @@ export function DownloadLibraryDrawer({
                   <a
                     href={`${job.audioUrl.startsWith('http') ? job.audioUrl : `${API_HOST}${job.audioUrl}`}`}
                     download
-                    className="rounded-lg bg-accent px-4 py-2 text-xs font-medium uppercase tracking-wider text-canvas transition hover:bg-accent-hover"
+                    className="rounded-lg bg-accent px-4 py-2 text-xs font-medium tracking-tight text-canvas transition hover:bg-accent-hover"
                   >
                     24-bit WAV
                   </a>
                   <button
                     onClick={() => onSelectJob(job)}
-                    className="rounded-lg border border-border-default bg-surface px-4 py-2 text-xs font-medium uppercase tracking-wider text-secondary transition hover:bg-overlay hover:border-border-emphasis"
+                    className="rounded-lg border border-border-default bg-surface px-4 py-2 text-xs font-medium tracking-tight text-secondary transition hover:bg-overlay hover:border-border-emphasis"
                   >
                     Load in Studio
                   </button>
@@ -149,7 +149,7 @@ export function DownloadLibraryDrawer({
                       }
                     }}
                     disabled={busyId === job.id}
-                    className="rounded-lg border border-border-default px-4 py-2 text-xs font-medium uppercase tracking-wider text-secondary transition hover:bg-overlay hover:text-primary disabled:opacity-50"
+                    className="rounded-lg border border-border-default px-4 py-2 text-xs font-medium tracking-tight text-secondary transition hover:bg-overlay hover:text-primary disabled:opacity-50"
                   >
                     {busyId === job.id ? 'Re-rendering...' : 'Reprint'}
                   </button>

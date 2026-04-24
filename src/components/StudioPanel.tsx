@@ -154,7 +154,7 @@ export function StudioPanel({
   const [tasteProfile, setTasteProfile] = useState<TasteProfile | null>(null);
   const [tasteLoading, setTasteLoading] = useState(false);
   const [renderError, setRenderError] = useState<string>('');
-  const [selectedProvider, setSelectedProvider] = useState('rvc');
+  const [selectedProvider, setSelectedProvider] = useState('so-vits');
   const [customMintMode, setCustomMintMode] = useState<'glitch' | 'dream' | 'anthem'>('glitch');
   const [mintDuration, setMintDuration] = useState<number>(12);
   const [voiceControlsOpen, setVoiceControlsOpen] = useState(false);
@@ -485,7 +485,7 @@ export function StudioPanel({
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border-default bg-surface p-4">
         {/* Mode Toggle */}
         <div className="flex items-center gap-3">
-          <span className="text-xs font-medium uppercase tracking-wide text-muted">Mode</span>
+          <span className="text-xs font-medium tracking-tight text-muted">Mode</span>
           <div className="flex rounded-lg border border-border-default bg-canvas p-0.5">
             <button
               onClick={() => setStudioMode('simple')}
@@ -512,7 +512,7 @@ export function StudioPanel({
 
         {/* Preset Selector - Horizontal scroll, no wrap */}
         <div className="flex min-w-0 flex-1 items-center gap-3 overflow-hidden">
-          <span className="shrink-0 text-xs font-medium uppercase tracking-wide text-muted">Preset</span>
+          <span className="shrink-0 text-xs font-medium tracking-tight text-muted">Preset</span>
           <div className="flex gap-1 overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {studioPresets.map((preset) => (
               <button
@@ -549,7 +549,7 @@ export function StudioPanel({
         {/* Left: Lyrics & Prompt */}
         <div className="space-y-4">
           <div>
-            <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-muted">
+            <label className="mb-2 block text-xs font-medium tracking-tight text-muted">
               Lyrics
             </label>
             <textarea
@@ -563,7 +563,7 @@ export function StudioPanel({
             {studioMode === 'advanced' && (
               <button
                 onClick={handleRewrite}
-                className="mt-3 rounded-lg border border-border-default bg-surface px-4 py-2 text-xs font-medium uppercase tracking-wider text-secondary transition hover:bg-overlay hover:border-border-emphasis"
+                className="mt-3 rounded-lg border border-border-default bg-surface px-4 py-2 text-xs font-medium tracking-tight text-secondary transition hover:bg-overlay hover:border-border-emphasis"
               >
                 Rewrite with AI
               </button>
@@ -572,13 +572,13 @@ export function StudioPanel({
 
           <div>
             <div className="mb-2 flex items-center justify-between">
-              <label className="text-xs font-medium uppercase tracking-wide text-muted">
+              <label className="text-xs font-medium tracking-tight text-muted">
                 Style Prompt
               </label>
               <button
                 onClick={handleAutoConfig}
                 disabled={!stylePrompt.trim() || autoConfiguring}
-                className="flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-accent transition hover:bg-accent/10 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-medium tracking-tight text-accent transition hover:bg-accent/10 disabled:opacity-40 disabled:cursor-not-allowed"
                 title="Auto-configure controls based on style keywords"
               >
                 <SparklesIcon size={12} />
@@ -600,7 +600,7 @@ export function StudioPanel({
           <>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-muted">
+              <label className="mb-2 block text-xs font-medium tracking-tight text-muted">
                 Session Tag / Collection
               </label>
               <input
@@ -611,7 +611,7 @@ export function StudioPanel({
               />
             </div>
             <div>
-              <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-muted">
+              <label className="mb-2 block text-xs font-medium tracking-tight text-muted">
                 Accent
               </label>
               <select
@@ -627,7 +627,7 @@ export function StudioPanel({
               </select>
             </div>
           </div>
-          <label className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted">
+          <label className="flex items-center gap-2 text-xs font-medium tracking-tight text-muted">
             <input
               type="checkbox"
               className=""
@@ -639,14 +639,14 @@ export function StudioPanel({
 
           <div className="space-y-3">
             <div>
-              <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-muted">
+              <label className="mb-2 block text-xs font-medium tracking-tight text-muted">
                 Guide Vocal (Optional)
               </label>
               <GuideDropzone onFile={setGuide} />
             </div>
             {guide && activePersonaId && (
               <div className="flex flex-col gap-2 rounded-xl border border-border-default bg-surface p-3">
-                <p className="text-[11px] uppercase tracking-wide text-muted">Save uploaded clip</p>
+                <p className="text-[11px] tracking-tight text-muted">Save uploaded clip</p>
                 <input
                   className="rounded-lg border border-border-default bg-canvas px-3 py-2 text-sm text-primary placeholder-disabled focus:border-accent focus:outline-none"
                   placeholder="Clip name"
@@ -656,7 +656,7 @@ export function StudioPanel({
                 <button
                   onClick={handleSaveGuideSample}
                   disabled={savingGuide}
-                  className="rounded-lg border border-border-default px-3 py-2 text-xs font-medium uppercase tracking-wide text-secondary transition hover:border-border-emphasis disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-lg border border-border-default px-3 py-2 text-xs font-medium tracking-tight text-secondary transition hover:border-border-emphasis disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {savingGuide ? 'Saving...' : 'Save to Voice Library'}
                 </button>
@@ -664,7 +664,7 @@ export function StudioPanel({
             )}
             {(guideSamples.length > 0 || guide) && (
               <div className="space-y-3 rounded-xl border border-border-default bg-surface p-3">
-                <p className="text-[11px] uppercase tracking-wide text-muted">Guide Controls</p>
+                <p className="text-[11px] tracking-tight text-muted">Guide Controls</p>
                 {guideSamples.length > 0 && (
                   <>
                     <select
@@ -695,7 +695,7 @@ export function StudioPanel({
                     </p>
                   </>
                 )}
-                <label className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted">
+                <label className="flex items-center gap-2 text-[11px] tracking-tight text-muted">
                   <input
                     type="checkbox"
                     className=""
@@ -711,7 +711,7 @@ export function StudioPanel({
                     : 'Upload or select a guide to enable lyric matching.'}
                 </p>
                 <div>
-                  <p className="text-[11px] uppercase tracking-wide text-muted">Guide Match Intensity</p>
+                  <p className="text-[11px] tracking-tight text-muted">Guide Match Intensity</p>
                   <div className="mt-1 flex items-center justify-between text-xs text-secondary">
                     <span>Alien/Creative</span>
                     <span className="font-mono text-primary">{Math.round(guideMatchIntensity * 100)}%</span>
@@ -729,7 +729,7 @@ export function StudioPanel({
                   />
                 </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-wide text-muted">Accent Blend</p>
+                  <p className="text-[11px] tracking-tight text-muted">Accent Blend</p>
                   <div className="mt-1 flex items-center justify-between text-xs text-secondary">
                     <span>Guide Accent</span>
                     <span className="font-mono text-primary">{Math.round(guideAccentBlend * 100)}%</span>
@@ -750,7 +750,7 @@ export function StudioPanel({
                   </p>
                 </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-wide text-muted">Guide Tempo</p>
+                  <p className="text-[11px] tracking-tight text-muted">Guide Tempo</p>
                   <div className="mt-1 flex items-center justify-between text-xs text-secondary">
                     <span>Speed</span>
                     <span className="font-mono text-primary">{guideTempo.toFixed(2)}x</span>
@@ -767,7 +767,7 @@ export function StudioPanel({
                   />
                 </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-wide text-muted">Render Length</p>
+                  <p className="text-[11px] tracking-tight text-muted">Render Length</p>
                   <select
                     value={guideDurationPreset}
                     onChange={(e) => {
@@ -795,7 +795,7 @@ export function StudioPanel({
                 {guideDurationPreset === 'custom' && (
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <p className="text-[11px] uppercase tracking-wide text-muted">Start (seconds)</p>
+                      <p className="text-[11px] tracking-tight text-muted">Start (seconds)</p>
                       <input
                         type="number"
                         min={0}
@@ -808,7 +808,7 @@ export function StudioPanel({
                       />
                     </div>
                     <div>
-                      <p className="text-[11px] uppercase tracking-wide text-muted">End (seconds)</p>
+                      <p className="text-[11px] tracking-tight text-muted">End (seconds)</p>
                       <input
                         type="number"
                         min={0}
@@ -830,7 +830,7 @@ export function StudioPanel({
               <button
                 type="button"
                 onClick={() => setSuggestionsOpen((v) => !v)}
-                className="flex w-full items-center justify-between px-4 py-3 text-[11px] uppercase tracking-wider text-muted transition hover:text-secondary"
+                className="flex w-full items-center justify-between px-4 py-3 text-[11px] tracking-tight text-muted transition hover:text-secondary"
               >
                 <span>Suggested Clips {!suggestionsLoading && guideSuggestions.length > 0 ? `(${guideSuggestions.length})` : ''}</span>
                 <ChevronDownIcon
@@ -854,7 +854,7 @@ export function StudioPanel({
                         >
                           <p className="truncate text-sm font-medium text-primary">{suggestion.title}</p>
                           <p className="mt-0.5 line-clamp-2 text-[11px] text-muted">{suggestion.description}</p>
-                          <div className="mt-1.5 flex items-center justify-between text-[10px] uppercase tracking-wide text-muted">
+                          <div className="mt-1.5 flex items-center justify-between text-[10px] tracking-tight text-muted">
                             <span>{suggestion.vibe}</span>
                             <span>{Math.round(suggestion.matchConfidence * 100)}%</span>
                           </div>
@@ -870,7 +870,7 @@ export function StudioPanel({
                             {suggestion.action === 'use' ? (
                               <button
                                 onClick={() => handleUseSuggestion(suggestion)}
-                                className="w-full rounded-lg border border-border-default py-1.5 text-[11px] font-medium uppercase tracking-wide text-secondary transition hover:border-border-emphasis hover:text-primary"
+                                className="w-full rounded-lg border border-border-default py-1.5 text-[11px] font-medium tracking-tight text-secondary transition hover:border-border-emphasis hover:text-primary"
                               >
                                 Use Guide
                               </button>
@@ -878,7 +878,7 @@ export function StudioPanel({
                               <button
                                 onClick={() => handleMintSuggestion(suggestion)}
                                 disabled={mintingSuggestionId === suggestion.id}
-                                className="w-full rounded-lg border border-accent/40 py-1.5 text-[11px] font-medium uppercase tracking-wide text-accent transition hover:border-accent disabled:cursor-not-allowed disabled:opacity-40"
+                                className="w-full rounded-lg border border-accent/40 py-1.5 text-[11px] font-medium tracking-tight text-accent transition hover:border-accent disabled:cursor-not-allowed disabled:opacity-40"
                               >
                                 {mintingSuggestionId === suggestion.id ? 'Minting...' : 'Mint'}
                               </button>
@@ -927,19 +927,19 @@ export function StudioPanel({
             {tasteProfile && (
               <div className="space-y-3 rounded-xl border border-border-default bg-surface p-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-[11px] uppercase tracking-wide text-secondary">Taste Profile</p>
+                  <p className="text-[11px] tracking-tight text-secondary">Taste Profile</p>
                   <span className="font-mono text-[10px] text-muted">
                     {tasteLoading ? 'Refreshing...' : `${tasteProfile.likes} liked / ${tasteProfile.dislikes} passed`}
                   </span>
                 </div>
                 <div className="grid gap-3 text-sm text-secondary sm:grid-cols-2">
                   <div className="rounded-lg border border-border-subtle bg-canvas p-3">
-                    <p className="text-[10px] uppercase tracking-wide text-muted">Energy Bias</p>
+                    <p className="text-[10px] tracking-tight text-muted">Energy Bias</p>
                     <p className="text-xl font-semibold text-primary">{Math.round(tasteProfile.energeticPreference * 100)}%</p>
                     <p className="text-xs text-muted">Glitch affinity {Math.round(tasteProfile.glitchAffinity * 100)}%</p>
                   </div>
                   <div className="rounded-lg border border-border-subtle bg-canvas p-3">
-                    <p className="text-[10px] uppercase tracking-wide text-muted">Recommended Mint Mode</p>
+                    <p className="text-[10px] tracking-tight text-muted">Recommended Mint Mode</p>
                     <p className="text-xl font-semibold capitalize text-primary">{tasteProfile.recommendedMintMode}</p>
                     {tasteProfile.favoriteGuide && (
                       <p className="text-xs text-muted">
@@ -950,7 +950,7 @@ export function StudioPanel({
                   </div>
                 </div>
                 {tasteProfile.recentLabels.length > 0 && (
-                  <div className="flex flex-wrap gap-2 text-[10px] uppercase tracking-wide text-muted">
+                  <div className="flex flex-wrap gap-2 text-[10px] tracking-tight text-muted">
                     {tasteProfile.recentLabels.map((label) => (
                       <span key={label} className="rounded-full border border-border-default px-3 py-1">
                         {label}
@@ -972,7 +972,7 @@ export function StudioPanel({
             <button
               type="button"
               onClick={() => setVoiceControlsOpen((v) => !v)}
-              className="flex w-full items-center justify-between px-4 py-3 text-[11px] uppercase tracking-wider text-muted transition hover:text-secondary"
+              className="flex w-full items-center justify-between px-4 py-3 text-[11px] tracking-tight text-muted transition hover:text-secondary"
             >
               <span>Voice Controls</span>
               <ChevronDownIcon
@@ -990,7 +990,7 @@ export function StudioPanel({
             <button
               type="button"
               onClick={() => setEffectsOpen((v) => !v)}
-              className="flex w-full items-center justify-between px-4 py-3 text-[11px] uppercase tracking-wider text-muted transition hover:text-secondary"
+              className="flex w-full items-center justify-between px-4 py-3 text-[11px] tracking-tight text-muted transition hover:text-secondary"
             >
               <span>Effects & Mastering</span>
               <ChevronDownIcon
@@ -1002,7 +1002,7 @@ export function StudioPanel({
             <div className="space-y-4 border-t border-border-subtle px-4 pb-4 pt-3">
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex flex-1 flex-col">
-                  <p className="text-[11px] uppercase tracking-wide text-muted">FX Preset</p>
+                  <p className="text-[11px] tracking-tight text-muted">FX Preset</p>
                   <select
                     className="mt-1 rounded-lg border border-border-default bg-canvas px-3 py-2 text-sm text-primary focus:border-accent focus:outline-none"
                     value={effects.preset ?? 'clean'}
@@ -1018,7 +1018,7 @@ export function StudioPanel({
                     <option value="choir-cloud">Choir Cloud</option>
                   </select>
                 </div>
-                <label className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-secondary">
+                <label className="flex items-center gap-2 text-[11px] tracking-tight text-secondary">
                   <input
                     type="checkbox"
                     className=""
@@ -1031,7 +1031,7 @@ export function StudioPanel({
               <div className="grid gap-4 md:grid-cols-2">
                 {effectSliderConfig.map(({ key, label: sliderLabel }) => (
                   <div key={key}>
-                    <div className="flex items-center justify-between text-[11px] uppercase tracking-wider text-muted">
+                    <div className="flex items-center justify-between text-[11px] tracking-tight text-muted">
                       <span>{sliderLabel}</span>
                       <span>{Math.round(effects[key] * 100)}%</span>
                     </div>
@@ -1053,18 +1053,20 @@ export function StudioPanel({
                 ))}
               </div>
               <div className="mb-4">
-                <p className="mb-1 text-[11px] uppercase tracking-wider text-muted">Voice Provider</p>
+                <p className="mb-1 text-[11px] tracking-tight text-muted">Voice Provider</p>
                 <select
                   className="w-full rounded-lg border border-border-default bg-canvas px-3 py-2 text-sm text-primary focus:border-accent focus:outline-none"
                   value={selectedProvider}
                   onChange={(e) => setSelectedProvider(e.target.value)}
                 >
-                  <option value="rvc">Studio Clone (RVC)</option>
+                  <option value="so-vits">So-VITS-SVC (Best Voice Match)</option>
+                  <option value="ddsp">DDSP-SVC (Fast)</option>
+                  <option value="rvc">RVC (Spectral Transfer)</option>
                 </select>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <p className="mb-1 text-[11px] uppercase tracking-wider text-muted">Engine</p>
+                  <p className="mb-1 text-[11px] tracking-tight text-muted">Engine</p>
                   <select
                     className="w-full rounded-lg border border-border-default bg-canvas px-3 py-2 text-sm text-primary focus:border-accent focus:outline-none"
                     value={effects.engine}
@@ -1078,7 +1080,7 @@ export function StudioPanel({
                   </select>
                 </div>
                 <div>
-                  <p className="mb-1 text-[11px] uppercase tracking-wider text-muted">Space</p>
+                  <p className="mb-1 text-[11px] tracking-tight text-muted">Space</p>
                   <select
                     className="w-full rounded-lg border border-border-default bg-canvas px-3 py-2 text-sm text-primary focus:border-accent focus:outline-none"
                     value={effects.space}
@@ -1097,7 +1099,7 @@ export function StudioPanel({
                 <div className="grid gap-4 md:grid-cols-3">
                   {orbitSliderConfig.map(({ key, label: orbitLabel, defaultValue }) => (
                     <div key={key}>
-                      <div className="flex items-center justify-between text-[11px] uppercase tracking-wider text-muted">
+                      <div className="flex items-center justify-between text-[11px] tracking-tight text-muted">
                         <span>{orbitLabel}</span>
                         <span>{Math.round((effects[key] ?? defaultValue) * 100)}%</span>
                       </div>
@@ -1138,7 +1140,7 @@ export function StudioPanel({
             <button
               onClick={handleRender}
               disabled={!activePersonaId || busy}
-              className="w-full max-w-md rounded-2xl bg-accent px-6 py-4 text-sm font-medium uppercase tracking-wide text-canvas transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
+              className="w-full max-w-md rounded-2xl bg-accent px-6 py-4 text-sm font-medium tracking-tight text-canvas transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
             >
               {busy ? 'Rendering...' : 'Generate Vocal'}
             </button>
@@ -1159,7 +1161,7 @@ export function StudioPanel({
             <button
               onClick={handleRenderToSlot('A')}
               disabled={!activePersonaId || busy}
-              className={`rounded-2xl px-4 py-3 text-[11px] font-medium uppercase tracking-wide transition disabled:cursor-not-allowed disabled:opacity-40 ${
+              className={`rounded-2xl px-4 py-3 text-[11px] font-medium tracking-tight transition disabled:cursor-not-allowed disabled:opacity-40 ${
                 activeAbSlot === 'A' && abSlotA
                   ? 'bg-purple-500 text-white'
                   : 'border border-purple-500/40 bg-purple-500/10 text-purple-400 hover:bg-purple-500/20'
@@ -1170,7 +1172,7 @@ export function StudioPanel({
             <button
               onClick={handleRenderToSlot('B')}
               disabled={!activePersonaId || busy}
-              className={`rounded-2xl px-4 py-3 text-[11px] font-medium uppercase tracking-wide transition disabled:cursor-not-allowed disabled:opacity-40 ${
+              className={`rounded-2xl px-4 py-3 text-[11px] font-medium tracking-tight transition disabled:cursor-not-allowed disabled:opacity-40 ${
                 activeAbSlot === 'B' && abSlotB
                   ? 'bg-purple-500 text-white'
                   : 'border border-purple-500/40 bg-purple-500/10 text-purple-400 hover:bg-purple-500/20'
@@ -1184,19 +1186,19 @@ export function StudioPanel({
             <button
               onClick={handlePreview}
               disabled={!activePersonaId || previewBusy}
-              className="rounded-2xl border border-border-default bg-elevated px-4 py-3 text-[11px] font-medium uppercase tracking-wide text-secondary transition hover:bg-overlay hover:border-border-emphasis disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-2xl border border-border-default bg-elevated px-4 py-3 text-[11px] font-medium tracking-tight text-secondary transition hover:bg-overlay hover:border-border-emphasis disabled:cursor-not-allowed disabled:opacity-40"
             >
               {previewBusy ? 'Previewing...' : 'Preview 12s'}
             </button>
             <button
               onClick={handleRender}
               disabled={!activePersonaId || busy}
-              className="rounded-2xl bg-accent px-4 py-3 text-[11px] font-medium uppercase tracking-wide text-canvas transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-2xl bg-accent px-4 py-3 text-[11px] font-medium tracking-tight text-canvas transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
             >
               {busy ? 'Rendering...' : 'Render Vocal'}
             </button>
             <div className="rounded-2xl border border-border-default bg-elevated px-4 py-3">
-              <p className="text-[10px] uppercase tracking-wide text-muted">Status</p>
+              <p className="text-[10px] tracking-tight text-muted">Status</p>
               <p className="text-sm text-secondary">
                 {busy
                   ? 'Printing chromatic mix...'
@@ -1210,7 +1212,7 @@ export function StudioPanel({
 
         <div className="mt-4 rounded-2xl border border-border-default bg-canvas p-4">
           <Meter active={busy || previewBusy} />
-          <div className="mt-2 grid grid-cols-4 text-[9px] uppercase tracking-wide text-muted">
+          <div className="mt-2 grid grid-cols-4 text-[9px] tracking-tight text-muted">
             <span>Tempo {guideTempo.toFixed(2)}x</span>
             <span>Blend {Math.round(guideMatchIntensity * 100)}%</span>
             <span className="text-right">{effects.bypassEffects ? 'Bypass' : effects.preset}</span>
@@ -1258,7 +1260,7 @@ export function StudioPanel({
             {/* Pick Winner */}
             {abSlotA && abSlotB && (
               <div className="flex items-center justify-center gap-4">
-                <span className="text-xs text-muted uppercase tracking-wide">Pick winner:</span>
+                <span className="text-xs text-muted tracking-tight">Pick winner:</span>
                 <button
                   onClick={() => handlePickWinner('A')}
                   className="rounded-lg bg-purple-500/20 px-4 py-2 text-sm font-medium text-purple-400 transition hover:bg-purple-500/30"
@@ -1305,13 +1307,13 @@ export function StudioPanel({
                     <a
                       href={outputUrl}
                       download
-                      className="shrink-0 rounded-lg border border-border-default px-3 py-2 text-[10px] font-medium uppercase tracking-wide text-secondary transition hover:border-border-emphasis hover:text-primary"
+                      className="shrink-0 rounded-lg border border-border-default px-3 py-2 text-[10px] font-medium tracking-tight text-secondary transition hover:border-border-emphasis hover:text-primary"
                     >
                       Download
                     </a>
                   </div>
                   {latestRender && (
-                    <div className="mt-3 flex flex-col gap-2 text-[11px] uppercase tracking-wide text-muted">
+                    <div className="mt-3 flex flex-col gap-2 text-[11px] tracking-tight text-muted">
                       <span>Rate this print</span>
                       <div className="flex flex-wrap gap-2">
                         <button

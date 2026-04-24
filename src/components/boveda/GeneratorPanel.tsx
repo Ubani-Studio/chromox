@@ -26,7 +26,7 @@ type PillSelectorProps = {
 function PillSelector({ label, options, value, onChange }: PillSelectorProps) {
   return (
     <div>
-      <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-muted">{label}</label>
+      <label className="mb-1.5 block text-[10px] font-medium tracking-tight text-muted">{label}</label>
       <div className="flex flex-wrap gap-1.5">
         {options.map((opt) => (
           <button
@@ -217,7 +217,7 @@ export function GeneratorPanel({ onAcceptPersona, onAcceptRelic, personas = [] }
     <div className="rounded-xl border border-border-default bg-surface">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border-default px-5 py-4">
-        <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-primary">
+        <h2 className="font-display text-sm font-semibold tracking-tight text-primary">
           Character & Relic Generator
         </h2>
       </div>
@@ -246,7 +246,7 @@ export function GeneratorPanel({ onAcceptPersona, onAcceptRelic, personas = [] }
 
         {/* Settings */}
         <div className="space-y-3 rounded-lg border border-border-default bg-canvas p-4">
-          <h3 className="mb-3 text-[10px] font-medium uppercase tracking-wider text-muted">Settings</h3>
+          <h3 className="mb-3 text-[10px] font-medium tracking-tight text-muted">Settings</h3>
 
           {!isRelic && (
             <>
@@ -259,7 +259,7 @@ export function GeneratorPanel({ onAcceptPersona, onAcceptRelic, personas = [] }
           {isRelic && (
             <>
               <div>
-                <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-muted">Attach to Persona</label>
+                <label className="mb-1.5 block text-[10px] font-medium tracking-tight text-muted">Attach to Persona</label>
                 <select
                   value={relicPersonaId}
                   onChange={(e) => setRelicPersonaId(e.target.value)}
@@ -284,7 +284,7 @@ export function GeneratorPanel({ onAcceptPersona, onAcceptRelic, personas = [] }
 
           {/* Variance slider */}
           <div>
-            <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-muted">
+            <label className="mb-1.5 block text-[10px] font-medium tracking-tight text-muted">
               Variance <span className="ml-1 normal-case text-secondary">{variance}%</span>
             </label>
             <input
@@ -305,7 +305,7 @@ export function GeneratorPanel({ onAcceptPersona, onAcceptRelic, personas = [] }
 
         {/* Result */}
         <div className="space-y-3 rounded-lg border border-border-default bg-canvas p-4">
-          <h3 className="text-[10px] font-medium uppercase tracking-wider text-muted">Result</h3>
+          <h3 className="text-[10px] font-medium tracking-tight text-muted">Result</h3>
 
           <div className="font-display text-2xl font-bold tracking-wide text-primary">
             {displayName}
@@ -314,7 +314,7 @@ export function GeneratorPanel({ onAcceptPersona, onAcceptRelic, personas = [] }
           {isRelic ? (
             <>
               {generated.arcana?.coreDesire && (
-                <p className="text-[10px] uppercase tracking-widest text-muted">{generated.arcana.coreDesire}</p>
+                <p className="text-[10px] tracking-tight text-muted">{generated.arcana.coreDesire}</p>
               )}
               {generated.relics?.[0]?.origin && (
                 <div className="text-sm text-secondary">

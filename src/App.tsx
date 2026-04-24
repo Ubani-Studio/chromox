@@ -24,7 +24,9 @@ import { DownloadsTab } from './components/DownloadsTab';
 import { EditPersonaModal } from './components/EditPersonaModal';
 import { VoiceTrainingModal } from './components/VoiceTrainingModal';
 import { AudioProvider } from './contexts/AudioContext';
-import { LogoIcon, MicIcon, FolderIcon, ShieldIcon, LibraryIcon, SparklesIcon } from './components/Icons';
+// Icons intentionally not imported here - sidebar is text-only per
+// minimal-luxury-restraint register. Child components still use their
+// own icons where function (upload, chevron, spinner) requires them.
 import { BovedaTab } from './components/boveda/BovedaTab';
 import { VoiceLibraryTab } from './components/VoiceLibraryTab';
 import { AdminFlowTab } from './components/AdminFlowTab';
@@ -196,15 +198,15 @@ export default function App() {
 
   const totalGuideSamples = personas.reduce((sum, p) => sum + (p.guide_samples?.length ?? 0), 0);
 
-  const tabs: { id: TabId; label: string; icon: React.ReactNode; count?: number }[] = [
-    { id: 'studio', label: 'Studio', icon: <MicIcon size={14} /> },
-    { id: 'library', label: 'Voice Library', icon: <LibraryIcon size={14} />, count: totalGuideSamples },
-    // Fix - Suno persona regen surface. Drop a song, click the wrong
-    // words, type what they should say, same voice comes back fixed.
-    { id: 'fix', label: 'Fix', icon: <SparklesIcon size={14} /> },
-    { id: 'downloads', label: 'Downloads', icon: <FolderIcon size={14} />, count: renderHistory.length },
-    { id: 'boveda', label: 'Boveda', icon: <ShieldIcon size={14} /> },
-    ...(adminMode ? [{ id: 'admin' as TabId, label: 'Admin', icon: <SparklesIcon size={14} /> }] : []),
+  // Sidebar labels: title case (capital letter, rest lowercase). No
+  // all-caps, no icons - the text is the affordance.
+  const tabs: { id: TabId; label: string; count?: number }[] = [
+    { id: 'studio', label: 'Studio' },
+    { id: 'library', label: 'Voice library', count: totalGuideSamples },
+    { id: 'fix', label: 'Fix' },
+    { id: 'downloads', label: 'Downloads', count: renderHistory.length },
+    { id: 'boveda', label: 'Boveda' },
+    ...(adminMode ? [{ id: 'admin' as TabId, label: 'Admin' }] : []),
   ];
 
   return (
@@ -218,7 +220,7 @@ export default function App() {
             <h1 className="font-display text-2xl font-semibold tracking-tight select-none text-primary">
               Mmuo
             </h1>
-            <p className="text-[10px] uppercase tracking-widest text-muted mt-1">
+            <p className="text-xs text-muted mt-1 tracking-tight">
               Persona forge
             </p>
           </div>
@@ -228,14 +230,13 @@ export default function App() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-3 px-3 py-2 text-sm font-medium tracking-tight transition-colors text-left ${
+                className={`flex items-center justify-between px-3 py-2 text-sm font-medium tracking-tight transition-colors text-left ${
                   activeTab === tab.id
                     ? 'text-accent bg-accent-subtle border-l-2 border-accent -ml-[2px] pl-[14px]'
                     : 'text-secondary hover:text-primary hover:bg-overlay border-l-2 border-transparent -ml-[2px] pl-[14px]'
                 }`}
               >
-                <span className="shrink-0 opacity-80">{tab.icon}</span>
-                <span className="flex-1">{tab.label}</span>
+                <span>{tab.label}</span>
                 {tab.count !== undefined && tab.count > 0 && (
                   <span className="text-[10px] font-mono text-muted">
                     {tab.count}
@@ -245,19 +246,19 @@ export default function App() {
             ))}
           </nav>
 
-          {/* Sidebar footer actions */}
+          {/* Sidebar footer actions - text only, no icons */}
           <div className="px-3 py-4 border-t border-border-default flex flex-col gap-1">
             <button
               onClick={() => setCloneOpen(true)}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-accent hover:bg-accent-subtle border border-accent/40 transition-colors"
+              className="px-3 py-2 text-sm font-medium text-accent hover:bg-accent-subtle border border-accent/40 transition-colors text-left"
             >
-              <LogoIcon size={14} /> Clone voice
+              Clone voice
             </button>
             <button
               onClick={() => setForgeOpen(true)}
               className="px-3 py-2 text-sm font-medium text-secondary hover:text-primary hover:bg-overlay transition-colors text-left"
             >
-              + New persona
+              New persona
             </button>
           </div>
         </aside>
@@ -271,7 +272,7 @@ export default function App() {
               <aside className="w-80 shrink-0">
                 <div className="sticky top-6 rounded-2xl border border-border-default bg-surface p-4">
                   <div className="mb-4">
-                    <h2 className="text-xs font-medium uppercase tracking-wide text-muted">Personas</h2>
+                    <h2 className="text-xs font-medium tracking-tight text-muted">Personas</h2>
                     <p className="text-xs text-muted">{personas.length} voice{personas.length !== 1 ? 's' : ''}</p>
                   </div>
 
@@ -373,20 +374,20 @@ export default function App() {
                         <p className="mt-1 max-w-md text-sm text-secondary">{activePersona.description}</p>
                         <div className="mt-4 flex items-center gap-3">
                           {activePersona.is_cloned && (
-                            <span className="border border-border-default px-3 py-1 text-xs font-medium uppercase tracking-wide text-secondary">
+                            <span className="border border-border-default px-3 py-1 text-xs font-medium tracking-tight text-secondary">
                               Voice Clone
                             </span>
                           )}
                           <button
                             onClick={() => setEditingPersona(activePersona)}
-                            className="border border-border-default px-4 py-1.5 text-xs font-medium uppercase tracking-wide text-secondary transition hover:border-border-emphasis hover:text-primary"
+                            className="border border-border-default px-4 py-1.5 text-xs font-medium tracking-tight text-secondary transition hover:border-border-emphasis hover:text-primary"
                           >
                             Edit Persona
                           </button>
                           {activePersona.is_cloned && (
                             <button
                               onClick={() => setTrainingPersona(activePersona)}
-                              className="border border-accent/30 bg-accent/5 px-4 py-1.5 text-xs font-medium uppercase tracking-wide text-accent transition hover:bg-accent/10 hover:border-accent/50"
+                              className="border border-accent/30 bg-accent/5 px-4 py-1.5 text-xs font-medium tracking-tight text-accent transition hover:bg-accent/10 hover:border-accent/50"
                             >
                               Train Voice
                             </button>

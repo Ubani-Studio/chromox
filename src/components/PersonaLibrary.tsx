@@ -15,7 +15,7 @@ export function PersonaLibrary({ personas, activePersonaId, onSelect, onCreate, 
     <section className="rounded-3xl border border-border-default bg-surface p-6">
       <header className="mb-6 flex items-center justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted">Persona Vault</p>
+          <p className="text-xs font-medium tracking-tight text-muted">Persona Vault</p>
           <h2 className="font-display text-2xl font-semibold tracking-tight">Voice Collection</h2>
         </div>
         <div className="flex gap-3">

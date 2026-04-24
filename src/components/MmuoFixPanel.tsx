@@ -164,7 +164,7 @@ export default function MmuoFixPanel() {
   return (
     <div className="p-6 bg-black border border-neutral-900 space-y-6 max-w-4xl">
       <div>
-        <div className="text-xs uppercase tracking-widest text-neutral-600 mb-1">Mmuo</div>
+        <div className="text-xs tracking-tight text-neutral-600 mb-1">Mmuo</div>
         <h2 className="font-serif text-3xl text-white tracking-tight">Fix a lyric</h2>
         <p className="text-xs text-neutral-600 mt-2 max-w-xl leading-relaxed">
           Drop the Suno song, click the words you want to fix, type what they should be.
@@ -175,7 +175,7 @@ export default function MmuoFixPanel() {
       {/* Persona id + track id + bpm (one-time per song) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-600 mb-1">
+          <label className="block text-xs tracking-tight text-neutral-600 mb-1">
             Persona voice model
           </label>
           <input
@@ -186,7 +186,7 @@ export default function MmuoFixPanel() {
           />
         </div>
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-600 mb-1">
+          <label className="block text-xs tracking-tight text-neutral-600 mb-1">
             Suno track id
           </label>
           <input
@@ -197,7 +197,7 @@ export default function MmuoFixPanel() {
           />
         </div>
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-600 mb-1">
+          <label className="block text-xs tracking-tight text-neutral-600 mb-1">
             BPM <span className="text-neutral-700 normal-case">(optional)</span>
           </label>
           <input
@@ -212,7 +212,7 @@ export default function MmuoFixPanel() {
 
       {/* Dropzone */}
       <div>
-        <label className="block text-xs uppercase tracking-widest text-neutral-600 mb-2">
+        <label className="block text-xs tracking-tight text-neutral-600 mb-2">
           Song file
         </label>
         <input
@@ -228,7 +228,7 @@ export default function MmuoFixPanel() {
       {words.length > 0 && (
         <div>
           <div className="flex items-baseline justify-between mb-2">
-            <div className="text-xs uppercase tracking-widest text-neutral-600">
+            <div className="text-xs tracking-tight text-neutral-600">
               Transcript · click a word, shift-click another to define the fix window
             </div>
             {hasSelection && (
@@ -262,7 +262,7 @@ export default function MmuoFixPanel() {
       {/* What the new lyrics should say */}
       {hasSelection && (
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-600 mb-1">
+          <label className="block text-xs tracking-tight text-neutral-600 mb-1">
             Should say
           </label>
           <div className="text-xs text-neutral-700 mb-2 italic">
@@ -283,7 +283,7 @@ export default function MmuoFixPanel() {
         <button
           onClick={runFix}
           disabled={working || !hasSelection || !promptText.trim() || !personaVoiceModel || !sourceTrackId}
-          className="px-6 py-2 border border-pink-700 text-pink-400 uppercase tracking-widest text-xs hover:bg-pink-900/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="px-6 py-2 border border-pink-700 text-pink-400 tracking-tight text-xs hover:bg-pink-900/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           {working ? stage || 'Working…' : 'Fix lyric'}
         </button>
@@ -294,7 +294,7 @@ export default function MmuoFixPanel() {
       {/* Result */}
       {result && audioUrl && (
         <div className="border-t border-neutral-900 pt-6 space-y-3">
-          <div className="text-xs uppercase tracking-widest text-neutral-600">
+          <div className="text-xs tracking-tight text-neutral-600">
             Fixed {result.fixedPath ? '(full song, crossfaded)' : '(section only)'}
           </div>
           {result.rawText && (
@@ -309,7 +309,7 @@ export default function MmuoFixPanel() {
           <a
             href={audioUrl}
             download
-            className="inline-block text-xs uppercase tracking-widest text-neutral-400 hover:text-pink-400 border-b border-neutral-900 hover:border-pink-700 pb-0.5 transition-colors"
+            className="inline-block text-xs tracking-tight text-neutral-400 hover:text-pink-400 border-b border-neutral-900 hover:border-pink-700 pb-0.5 transition-colors"
           >
             Download
           </a>

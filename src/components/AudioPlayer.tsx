@@ -87,7 +87,7 @@ export function AudioPlayer({ src, label = 'Playback' }: Props) {
           {playing ? <PauseIcon size={14} /> : <PlayIcon size={14} />}
         </button>
         <div className="flex-1">
-          <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-muted">
+          <div className="flex items-center justify-between text-[11px] tracking-tight text-muted">
             <span>{label}</span>
             <span>
               {formatTime(progress)} / {formatTime(duration)}
