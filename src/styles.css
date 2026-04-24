@@ -64,10 +64,15 @@
   --brand-text: #F5F5F5;
   --brand-secondary: #A0A0A0;
   --brand-border: #1F1F1F;
-  /* Tyrian magenta is now the primary brand accent, not just waveform. */
-  --brand-accent: #66023C;
-  --brand-accent-hover: #8B0A50;
-  --brand-accent-subtle: rgba(102, 2, 60, 0.12);
+  /* Deepened Tyrian: default sits back against black (reads as wine,
+     not hot pink). Active / hover states escalate to the brighter
+     #66023C. Subtle uses the deeper wine at 15% so tinted surfaces
+     stay legible without turning neon on dark. */
+  --brand-accent: #4A0226;
+  --brand-accent-hover: #66023C;
+  --brand-accent-subtle: rgba(74, 2, 38, 0.15);
+  /* Waveforms stay on the brighter Tyrian so they read as signal,
+     not chrome. */
   --brand-waveform: #66023C;
   --brand-waveform-hover: #8B0A50;
 

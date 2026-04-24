@@ -578,11 +578,10 @@ export function StudioPanel({
               <button
                 onClick={handleAutoConfig}
                 disabled={!stylePrompt.trim() || autoConfiguring}
-                className="flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-medium tracking-tight text-accent transition hover:bg-accent/10 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-2 py-1 text-[10px] font-medium tracking-tight text-accent transition hover:bg-accent/10 disabled:opacity-40 disabled:cursor-not-allowed"
                 title="Auto-configure controls based on style keywords"
               >
-                <SparklesIcon size={12} />
-                {autoConfiguring ? 'Configuring...' : 'Auto-Config'}
+                {autoConfiguring ? 'Configuring…' : 'Auto-config'}
               </button>
             </div>
             <input
