@@ -2,7 +2,7 @@
 
 # Chromox - Stop All Services
 
-echo "🛑 Stopping Mmuo services..."
+echo "Stopping Mmuo services..."
 
 # Kill by port
 echo "Killing processes on ports..."
@@ -22,4 +22,4 @@ if [ -f "logs/pids.txt" ]; then
 fi
 
 echo ""
-echo "✅ All services stopped!"
+echo "All services stopped!"

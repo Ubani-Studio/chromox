@@ -56,21 +56,20 @@
 }
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
-  /* Swanblade Light Palette */
-  --brand-bg: #FAFAFA;
-  --brand-surface: #FFFFFF;
-  --brand-text: #0A0A0A;
-  --brand-secondary: #6A6A6A;
-  --brand-border: #E0E0E0;
-  /* Black accent for UI elements */
-  --brand-accent: #0A0A0A;
-  --brand-accent-hover: #2A2A2A;
-  --brand-accent-subtle: rgba(10, 10, 10, 0.08);
-  /* Tyrian purple for waveforms only */
+  /* Mmuo Dark Palette - ceremonial / masquerade / calm-expensive */
+  --brand-bg: #000000;
+  --brand-surface: #0A0A0A;
+  --brand-text: #F5F5F5;
+  --brand-secondary: #A0A0A0;
+  --brand-border: #1F1F1F;
+  /* Tyrian magenta is now the primary brand accent, not just waveform. */
+  --brand-accent: #66023C;
+  --brand-accent-hover: #8B0A50;
+  --brand-accent-subtle: rgba(102, 2, 60, 0.12);
   --brand-waveform: #66023C;
-  --brand-waveform-hover: #520230;
+  --brand-waveform-hover: #8B0A50;
 
   /* Typography Hierarchy */
   --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;

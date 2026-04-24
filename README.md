@@ -13,7 +13,7 @@ Chromox is a standalone AI persona forge built around the Nebula Tone Network. I
 
 ## Features
 - Persona library with cards + forge modal for storing persona artifacts
-- **⬢ Voice Cloning** - Upload vocal stems, extract voice characteristics, and save voice personas
+- **Voice Cloning** - Upload vocal stems, extract voice characteristics, and save voice personas
   - Deep voice analysis (pitch, formants, timbre, vibrato, etc.)
   - 256-dimensional neural voice embeddings
   - Multi-provider support (RVC, ElevenLabs, OpenAI)

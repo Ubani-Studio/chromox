@@ -5,25 +5,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Swanblade Light Palette
-        canvas: '#FAFAFA',
-        surface: '#FFFFFF',
-        elevated: '#FFFFFF',
-        overlay: '#F5F5F5',
-        'border-default': '#E0E0E0',
-        'border-subtle': '#EBEBEB',
-        'border-emphasis': '#0A0A0A',
-        primary: '#0A0A0A',
-        secondary: '#6A6A6A',
-        muted: '#9A9A9A',
-        disabled: '#CCCCCC',
-        // Black accent (purple reserved for waveforms)
-        accent: '#0A0A0A',
-        'accent-hover': '#2A2A2A',
-        'accent-subtle': 'rgba(10, 10, 10, 0.08)',
-        // Waveform color (tyrian purple)
+        // Mmuo Dark Palette - masquerade / ceremonial / calm-expensive
+        canvas: '#000000',
+        surface: '#0A0A0A',
+        elevated: '#141414',
+        overlay: '#1A1A1A',
+        'border-default': '#1F1F1F',
+        'border-subtle': '#141414',
+        'border-emphasis': '#66023C',
+        primary: '#F5F5F5',
+        secondary: '#A0A0A0',
+        muted: '#6A6A6A',
+        disabled: '#3A3A3A',
+        // Accent = tyrian magenta (was reserved for waveforms, now the
+        // brand colour). Dark palette needs warmer accent contrast.
+        accent: '#66023C',
+        'accent-hover': '#8B0A50',
+        'accent-subtle': 'rgba(102, 2, 60, 0.12)',
+        // Waveform stays tyrian for consistency with the accent
         waveform: '#66023C',
-        'waveform-hover': '#520230',
+        'waveform-hover': '#8B0A50',
         // Status colors
         success: '#1A7F37',
         error: '#CF222E',

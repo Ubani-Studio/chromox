@@ -28,8 +28,9 @@ import { LogoIcon, MicIcon, FolderIcon, ShieldIcon, LibraryIcon, SparklesIcon } 
 import { BovedaTab } from './components/boveda/BovedaTab';
 import { VoiceLibraryTab } from './components/VoiceLibraryTab';
 import { AdminFlowTab } from './components/AdminFlowTab';
+import MmuoFixPanel from './components/MmuoFixPanel';
 
-type TabId = 'studio' | 'library' | 'downloads' | 'boveda' | 'admin';
+type TabId = 'studio' | 'library' | 'fix' | 'downloads' | 'boveda' | 'admin';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabId>('studio');
@@ -198,6 +199,9 @@ export default function App() {
   const tabs: { id: TabId; label: string; icon: React.ReactNode; count?: number }[] = [
     { id: 'studio', label: 'Studio', icon: <MicIcon size={14} /> },
     { id: 'library', label: 'Voice Library', icon: <LibraryIcon size={14} />, count: totalGuideSamples },
+    // Fix - Suno persona regen surface. Drop a song, click the wrong
+    // words, type what they should say, same voice comes back fixed.
+    { id: 'fix', label: 'Fix', icon: <SparklesIcon size={14} /> },
     { id: 'downloads', label: 'Downloads', icon: <FolderIcon size={14} />, count: renderHistory.length },
     { id: 'boveda', label: 'Boveda', icon: <ShieldIcon size={14} /> },
     ...(adminMode ? [{ id: 'admin' as TabId, label: 'Admin', icon: <SparklesIcon size={14} /> }] : []),
@@ -205,64 +209,61 @@ export default function App() {
 
   return (
     <AudioProvider>
-      <div className="flex min-h-screen flex-col text-primary">
-        {/* Header with Tabs */}
-        <header className="border-b border-border-default bg-surface">
-          <div className="mx-auto flex max-w-[1800px] items-center justify-between px-6 py-3">
-            {/* Left: Logo + Tabs */}
-            <div className="flex items-center gap-8">
-              <h1 className="font-display text-lg font-semibold tracking-tight select-none">
-                Mmuo
-              </h1>
-
-              {/* Tab Navigation */}
-              <nav className="flex items-center gap-1">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${
-                      activeTab === tab.id
-                        ? 'bg-accent text-canvas'
-                        : 'text-secondary hover:bg-overlay hover:text-primary'
-                    }`}
-                  >
-                    {tab.icon}
-                    {tab.label}
-                    {tab.count !== undefined && tab.count > 0 && (
-                      <span className={`rounded-full px-1.5 text-[10px] font-semibold ${
-                        activeTab === tab.id
-                          ? 'bg-canvas/20 text-canvas'
-                          : 'bg-elevated text-muted'
-                      }`}>
-                        {tab.count}
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </nav>
-            </div>
-
-            {/* Right: Actions */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setCloneOpen(true)}
-                className="flex items-center gap-2 rounded-lg border border-accent/30 bg-accent/5 px-4 py-2 text-sm font-medium text-accent transition hover:bg-accent/10 hover:border-accent/50"
-              >
-                <LogoIcon size={14} /> Clone Voice
-              </button>
-              <button
-                onClick={() => setForgeOpen(true)}
-                className="rounded-lg border border-border-default bg-surface px-4 py-2 text-sm font-medium text-secondary transition hover:bg-overlay hover:border-border-emphasis"
-              >
-                + New Persona
-              </button>
-            </div>
+      <div className="flex min-h-screen text-primary bg-canvas">
+        {/* Left sidebar - vertical nav, masquerade register. No emojis,
+            no gradients, no rounded tiles. Canela title + Sohne labels,
+            tyrian accent on the active row. */}
+        <aside className="fixed top-0 left-0 h-screen w-56 border-r border-border-default bg-canvas flex flex-col z-50">
+          <div className="px-6 pt-8 pb-6 border-b border-border-default">
+            <h1 className="font-display text-2xl font-semibold tracking-tight select-none text-primary">
+              Mmuo
+            </h1>
+            <p className="text-[10px] uppercase tracking-widest text-muted mt-1">
+              Persona forge
+            </p>
           </div>
-        </header>
 
-        {/* Main Content - Full Width */}
-        <main className="flex-1">
+          <nav className="flex-1 px-3 pt-4 flex flex-col gap-0.5">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-3 px-3 py-2 text-sm font-medium tracking-tight transition-colors text-left ${
+                  activeTab === tab.id
+                    ? 'text-accent bg-accent-subtle border-l-2 border-accent -ml-[2px] pl-[14px]'
+                    : 'text-secondary hover:text-primary hover:bg-overlay border-l-2 border-transparent -ml-[2px] pl-[14px]'
+                }`}
+              >
+                <span className="shrink-0 opacity-80">{tab.icon}</span>
+                <span className="flex-1">{tab.label}</span>
+                {tab.count !== undefined && tab.count > 0 && (
+                  <span className="text-[10px] font-mono text-muted">
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </nav>
+
+          {/* Sidebar footer actions */}
+          <div className="px-3 py-4 border-t border-border-default flex flex-col gap-1">
+            <button
+              onClick={() => setCloneOpen(true)}
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-accent hover:bg-accent-subtle border border-accent/40 transition-colors"
+            >
+              <LogoIcon size={14} /> Clone voice
+            </button>
+            <button
+              onClick={() => setForgeOpen(true)}
+              className="px-3 py-2 text-sm font-medium text-secondary hover:text-primary hover:bg-overlay transition-colors text-left"
+            >
+              + New persona
+            </button>
+          </div>
+        </aside>
+
+        {/* Main content shifts right of the 224px sidebar */}
+        <main className="flex-1 ml-56">
           {/* Studio Tab */}
           {activeTab === 'studio' && (
             <div className="mx-auto flex max-w-[1800px] gap-6 p-6">
@@ -444,6 +445,9 @@ export default function App() {
               onRefresh={refresh}
             />
           )}
+
+          {/* Fix Tab - Suno persona lyric regeneration */}
+          {activeTab === 'fix' && <MmuoFixPanel />}
 
           {/* Downloads Tab */}
           {activeTab === 'downloads' && (
