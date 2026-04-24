@@ -169,6 +169,82 @@ export class SunoProvider implements SingingProvider {
     };
   }
 
+  /**
+   * Resolve a Suno share URL or song id into the metadata Mmuo needs to
+   * do a persona-locked regen: track_id, persona_id, seed, audio_url,
+   * duration, tempo. The user only needs to paste the share link; all
+   * the persona/seed wiring happens here.
+   *
+   * Handles the common URL shapes:
+   *   https://suno.com/song/<uuid>
+   *   https://suno.com/s/<short>
+   *   https://app.suno.ai/song/<uuid>
+   *   <uuid>        (raw track id also accepted)
+   */
+  async resolveFromUrl(input: string): Promise<{
+    trackId: string;
+    personaId: string | null;
+    seed: number | null;
+    audioUrl: string | null;
+    duration: number | null;
+    tempo: number | null;
+    raw: unknown;
+  } | null> {
+    const trackId = this.extractTrackId(input);
+    if (!trackId) return null;
+    if (!this.apiKey || this.apiKey === 'demo-key') {
+      return {
+        trackId,
+        personaId: null,
+        seed: null,
+        audioUrl: null,
+        duration: null,
+        tempo: null,
+        raw: null,
+      };
+    }
+    try {
+      const r = await fetch(`${this.baseUrl}/tracks/${encodeURIComponent(trackId)}`, {
+        headers: { Authorization: `Bearer ${this.apiKey}` },
+      });
+      if (!r.ok) return null;
+      const j = (await r.json()) as Record<string, unknown>;
+      const personaId = (j.persona_id || j.personaId) as string | undefined;
+      const seed = (j.seed as number | undefined) ?? null;
+      const audioUrl = (j.audio_url || j.audioUrl) as string | undefined;
+      const duration = (j.duration as number | undefined) ?? null;
+      // Suno sometimes exposes BPM via metadata or tags; pick best signal.
+      const meta = (j.metadata as Record<string, unknown> | undefined) || {};
+      const tempoField =
+        (meta.tempo as number | undefined) ??
+        (meta.bpm as number | undefined) ??
+        (j.tempo as number | undefined) ??
+        null;
+      return {
+        trackId,
+        personaId: personaId || null,
+        seed,
+        audioUrl: audioUrl || null,
+        duration,
+        tempo: tempoField,
+        raw: j,
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  extractTrackId(input: string): string | null {
+    if (!input) return null;
+    const raw = input.trim();
+    // Raw UUID
+    if (/^[0-9a-f-]{32,40}$/i.test(raw)) return raw;
+    // Any Suno domain URL
+    const m = raw.match(/suno\.(?:com|ai)\/(?:song|s)\/([^/?#]+)/i);
+    if (m) return m[1];
+    return null;
+  }
+
   private styleFromControls(
     controls: ProviderRequest['controls'],
     accentType?: string

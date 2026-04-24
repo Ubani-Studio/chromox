@@ -1,23 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Mmuo Fix Panel — one-click vocal regeneration for Suno persona tracks.
+ * Mmuo Fix Panel - one-click vocal regeneration for Suno persona tracks.
  *
- * Flow:
- *   1. Drop the song file + paste persona id (+ optional Suno seed)
- *   2. Backend transcribes; UI shows clickable words
- *   3. User clicks a word, then shift-clicks another → defines the fix window
- *   4. User types what the new lyric should be
- *   5. Hit "Fix" → backend regenerates that section in the same persona
- *      voice at the same cadence, crossfade-splices back into the full
- *      song, streams back a fresh fully-fixed file
+ * Simplified flow (two inputs):
+ *   1. Paste the Suno song URL. Backend resolves the persona_id + seed
+ *      automatically via /suno-lookup.
+ *   2. Optionally upload an acapella. If omitted, the panel downloads
+ *      the audio directly from Suno via /download-suno.
+ *   3. UI transcribes the audio, shows every word clickable.
+ *   4. Click a word (+ shift-click another) to mark the fix window.
+ *   5. Type what the new lyric should say.
+ *   6. Hit Fix. Backend regenerates that section in the same persona
+ *      voice at the same cadence, crossfade-splices back into the
+ *      original, streams back a download-able fixed song.
  *
- * No ffmpeg, no timestamps, no manual splicing. One panel.
- *
- * Dev ports (Mmuo sits at 5170 to stay clear of Slayt on 5174 and
- * Tizita on 5180):
- *   Frontend:  http://localhost:5170
- *   Backend:   http://localhost:4414
+ * Dev ports:
+ *   Frontend  http://localhost:5170
+ *   Backend   http://localhost:4414
  */
 
 const API = 'http://localhost:4414';
@@ -26,6 +26,17 @@ interface Word {
   word: string;
   start: number;
   end: number;
+}
+
+interface SunoLookup {
+  trackId: string;
+  personaId: string | null;
+  seed: number | null;
+  voiceModel: string | null;
+  audioUrl: string | null;
+  duration: number | null;
+  tempo: number | null;
+  error?: string;
 }
 
 interface FixResponse {
@@ -39,11 +50,10 @@ interface FixResponse {
 }
 
 export default function MmuoFixPanel() {
-  const [file, setFile] = useState<File | null>(null);
-  const [uploadedPath, setUploadedPath] = useState<string | null>(null);
-  const [personaVoiceModel, setPersonaVoiceModel] = useState('');
-  const [sourceTrackId, setSourceTrackId] = useState('');
-  const [bpm, setBpm] = useState<number | ''>('');
+  const [sunoUrl, setSunoUrl] = useState('');
+  const [acapella, setAcapella] = useState<File | null>(null);
+  const [lookup, setLookup] = useState<SunoLookup | null>(null);
+  const [audioPath, setAudioPath] = useState<string | null>(null);
   const [words, setWords] = useState<Word[]>([]);
   const [selStart, setSelStart] = useState<number | null>(null);
   const [selEnd, setSelEnd] = useState<number | null>(null);
@@ -54,62 +64,80 @@ export default function MmuoFixPanel() {
   const [result, setResult] = useState<FixResponse | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Upload + transcribe on file change
-  useEffect(() => {
-    if (!file) return;
-    let cancelled = false;
-    (async () => {
-      setWorking(true);
-      setStage('Uploading…');
-      setError(null);
-      try {
+  async function resolveAndLoad() {
+    if (!sunoUrl.trim()) {
+      setError('Paste a Suno song URL first.');
+      return;
+    }
+    setWorking(true);
+    setError(null);
+    setWords([]);
+    setSelStart(null);
+    setSelEnd(null);
+    setResult(null);
+
+    try {
+      // 1. Resolve the Suno URL → persona id / seed / track id
+      setStage('Resolving Suno track…');
+      const lu = await fetch(`${API}/api/vocal-regen/suno-lookup`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ url: sunoUrl.trim() }),
+      });
+      const luData = (await lu.json()) as SunoLookup;
+      if (!lu.ok || luData.error) throw new Error(luData.error || 'lookup failed');
+      setLookup(luData);
+
+      // 2. Get the audio to work with. Prefer the uploaded acapella;
+      //    fall back to pulling from Suno directly.
+      let workingPath: string;
+      if (acapella) {
+        setStage('Uploading acapella…');
         const fd = new FormData();
-        fd.append('file', file);
+        fd.append('file', acapella);
         const up = await fetch(`${API}/api/personas/upload`, { method: 'POST', body: fd });
         const upData = (await up.json()) as { path?: string; error?: string };
         if (!up.ok || !upData.path) throw new Error(upData.error || 'upload failed');
-        if (cancelled) return;
-        setUploadedPath(upData.path);
-
-        setStage('Transcribing…');
-        const tr = await fetch(`${API}/api/vocal-regen/transcribe`, {
+        workingPath = upData.path;
+      } else {
+        setStage('Downloading from Suno…');
+        const dl = await fetch(`${API}/api/vocal-regen/download-suno`, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ sourceAudioPath: upData.path }),
+          body: JSON.stringify({ url: sunoUrl.trim() }),
         });
-        const trData = (await tr.json()) as { words?: Word[]; error?: string };
-        if (!tr.ok || !trData.words) throw new Error(trData.error || 'transcribe failed');
-        if (cancelled) return;
-        setWords(trData.words);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'failed');
-      } finally {
-        setWorking(false);
-        setStage('');
+        const dlData = (await dl.json()) as { audioPath?: string; error?: string };
+        if (!dl.ok || !dlData.audioPath) throw new Error(dlData.error || 'download failed');
+        workingPath = dlData.audioPath;
       }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [file]);
+      setAudioPath(workingPath);
 
-  const selStartSec = selStart != null ? words[selStart]?.start ?? null : null;
-  const selEndSec = selEnd != null ? words[selEnd]?.end ?? null : null;
+      // 3. Transcribe → word-level timing
+      setStage('Transcribing…');
+      const tr = await fetch(`${API}/api/vocal-regen/transcribe`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ sourceAudioPath: workingPath }),
+      });
+      const trData = (await tr.json()) as { words?: Word[]; error?: string };
+      if (!tr.ok || !trData.words) throw new Error(trData.error || 'transcribe failed');
+      setWords(trData.words);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'failed');
+    } finally {
+      setWorking(false);
+      setStage('');
+    }
+  }
+
   const originalLyrics =
     selStart != null && selEnd != null
       ? words.slice(selStart, selEnd + 1).map((w) => w.word).join(' ')
       : '';
 
   async function runFix() {
-    if (
-      !uploadedPath ||
-      !personaVoiceModel ||
-      !sourceTrackId ||
-      selStart == null ||
-      selEnd == null ||
-      !promptText.trim()
-    ) {
-      setError('Pick a word range + fill persona id + source track id + what to change.');
+    if (!lookup?.voiceModel || !audioPath || selStart == null || selEnd == null || !promptText.trim()) {
+      setError('Select words and type the new lyric.');
       return;
     }
     setWorking(true);
@@ -121,34 +149,35 @@ export default function MmuoFixPanel() {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          personaVoiceModel,
-          sourceTrackId,
-          sourceAudioPath: uploadedPath,
+          personaVoiceModel: lookup.voiceModel,
+          sourceTrackId: lookup.trackId,
+          sourceAudioPath: audioPath,
           startSec: words[selStart].start,
           endSec: words[selEnd].end,
           prompt: promptText.trim(),
           originalLyrics,
-          bpm: bpm || undefined,
+          bpm: lookup.tempo || undefined,
           preserveRhyme: true,
         }),
       });
       const data = (await r.json()) as FixResponse;
       if (!r.ok || data.error) throw new Error(data.error || 'fix failed');
       setResult(data);
-      setStage('');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'fix failed');
     } finally {
       setWorking(false);
+      setStage('');
     }
   }
 
   function handleWordClick(idx: number, e: React.MouseEvent) {
     if (e.shiftKey && selStart != null) {
-      setSelEnd(idx >= selStart ? idx : selStart);
       if (idx < selStart) {
-        setSelStart(idx);
         setSelEnd(selStart);
+        setSelStart(idx);
+      } else {
+        setSelEnd(idx);
       }
     } else {
       setSelStart(idx);
@@ -157,87 +186,83 @@ export default function MmuoFixPanel() {
   }
 
   const hasSelection = selStart != null && selEnd != null;
-  const audioUrl = result?.audioPath
+  const audioUrl = result?.fixedPath || result?.audioPath
     ? `${API}/api/vocal-regen/audio?path=${encodeURIComponent(result.fixedPath || result.audioPath)}`
     : null;
 
   return (
-    <div className="p-6 bg-black border border-neutral-900 space-y-6 max-w-4xl">
+    <div className="p-6 bg-canvas border border-border-default space-y-6 max-w-4xl">
       <div>
-        <div className="text-xs tracking-tight text-neutral-600 mb-1">Mmuo</div>
-        <h2 className="font-serif text-3xl text-white tracking-tight">Fix a lyric</h2>
-        <p className="text-xs text-neutral-600 mt-2 max-w-xl leading-relaxed">
-          Drop the Suno song, click the words you want to fix, type what they should be.
-          Same voice, same cadence, new words — the full song comes back fixed.
+        <h2 className="font-display text-3xl text-primary tracking-tight">Fix a lyric</h2>
+        <p className="text-xs text-muted mt-2 max-w-xl leading-relaxed">
+          Paste the Suno song link, optionally drop an acapella, click the
+          words you want to fix, type what they should say. Same voice,
+          same cadence, new words.
         </p>
       </div>
 
-      {/* Persona id + track id + bpm (one-time per song) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      {/* Step 1: Suno URL + acapella upload */}
+      <div className="space-y-3">
         <div>
-          <label className="block text-xs tracking-tight text-neutral-600 mb-1">
-            Persona voice model
+          <label className="block text-xs tracking-tight text-muted mb-1">
+            Suno song link
           </label>
           <input
-            value={personaVoiceModel}
-            onChange={(e) => setPersonaVoiceModel(e.target.value)}
-            placeholder="persona_id:abc123|seed:42"
-            className="w-full bg-black border border-neutral-900 text-white px-3 py-2 font-mono text-sm focus:outline-none focus:border-pink-700"
+            value={sunoUrl}
+            onChange={(e) => setSunoUrl(e.target.value)}
+            placeholder="https://suno.com/song/…"
+            className="w-full bg-canvas border border-border-default text-primary px-3 py-2 font-mono text-sm focus:outline-none focus:border-accent"
           />
         </div>
         <div>
-          <label className="block text-xs tracking-tight text-neutral-600 mb-1">
-            Suno track id
+          <label className="block text-xs tracking-tight text-muted mb-1">
+            Acapella <span className="text-disabled">(optional — drops from Suno if omitted)</span>
           </label>
           <input
-            value={sourceTrackId}
-            onChange={(e) => setSourceTrackId(e.target.value)}
-            placeholder="e.g. 7f3b2a…"
-            className="w-full bg-black border border-neutral-900 text-white px-3 py-2 font-mono text-sm focus:outline-none focus:border-pink-700"
+            type="file"
+            accept="audio/*"
+            onChange={(e) => setAcapella(e.target.files?.[0] || null)}
+            className="text-sm text-secondary file:mr-3 file:px-3 file:py-1.5 file:border file:border-border-default file:bg-canvas file:text-secondary file:cursor-pointer file:hover:border-accent"
           />
+          {acapella && <div className="text-xs text-muted mt-1">{acapella.name}</div>}
         </div>
-        <div>
-          <label className="block text-xs tracking-tight text-neutral-600 mb-1">
-            BPM <span className="text-neutral-700 normal-case">(optional)</span>
-          </label>
-          <input
-            type="number"
-            value={bpm}
-            onChange={(e) => setBpm(e.target.value ? Number(e.target.value) : '')}
-            placeholder="128"
-            className="w-full bg-black border border-neutral-900 text-white px-3 py-2 font-mono text-sm focus:outline-none focus:border-pink-700"
-          />
+        <div className="flex items-center gap-3 pt-1">
+          <button
+            onClick={resolveAndLoad}
+            disabled={working || !sunoUrl.trim()}
+            className="px-4 py-2 border border-accent/60 text-accent tracking-tight text-sm hover:bg-accent-subtle disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            {working && !words.length ? stage || 'Loading…' : 'Load'}
+          </button>
+          {lookup && (
+            <div className="text-xs text-muted tracking-tight">
+              {lookup.personaId ? (
+                <>
+                  Persona <span className="font-mono text-secondary">{lookup.personaId.slice(0, 10)}…</span>
+                  {lookup.tempo ? ` · ${lookup.tempo} BPM` : ''}
+                </>
+              ) : (
+                <span className="text-warning">No persona returned (Suno API key missing or track private)</span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Dropzone */}
-      <div>
-        <label className="block text-xs tracking-tight text-neutral-600 mb-2">
-          Song file
-        </label>
-        <input
-          type="file"
-          accept="audio/*"
-          onChange={(e) => setFile(e.target.files?.[0] || null)}
-          className="text-sm text-neutral-400 file:mr-3 file:px-3 file:py-1.5 file:border file:border-neutral-800 file:bg-black file:text-neutral-300 file:cursor-pointer file:hover:border-pink-700"
-        />
-        {file && <div className="text-xs text-neutral-600 mt-2">{file.name}</div>}
-      </div>
-
-      {/* Transcript with click-to-select */}
+      {/* Step 2: word-level transcript, click to select */}
       {words.length > 0 && (
-        <div>
-          <div className="flex items-baseline justify-between mb-2">
-            <div className="text-xs tracking-tight text-neutral-600">
-              Transcript · click a word, shift-click another to define the fix window
+        <div className="space-y-2 border-t border-border-default pt-6">
+          <div className="flex items-baseline justify-between">
+            <div className="text-xs tracking-tight text-muted">
+              Click a word, shift-click another to mark the fix window.
             </div>
             {hasSelection && (
-              <div className="text-xs text-pink-700 font-mono">
+              <div className="text-xs text-accent font-mono">
                 {words[selStart!].start.toFixed(2)}s → {words[selEnd!].end.toFixed(2)}s
               </div>
             )}
           </div>
-          <div className="border border-neutral-900 p-4 leading-loose">
+          <div className="border border-border-default p-4 leading-loose bg-surface">
             {words.map((w, i) => {
               const inSel =
                 selStart != null && selEnd != null && i >= selStart && i <= selEnd;
@@ -247,8 +272,8 @@ export default function MmuoFixPanel() {
                   onClick={(e) => handleWordClick(i, e)}
                   className={`cursor-pointer px-1 transition-colors ${
                     inSel
-                      ? 'bg-pink-900/40 text-white'
-                      : 'text-neutral-400 hover:bg-neutral-900'
+                      ? 'bg-accent-subtle text-primary'
+                      : 'text-secondary hover:bg-elevated'
                   }`}
                 >
                   {w.word}
@@ -259,13 +284,13 @@ export default function MmuoFixPanel() {
         </div>
       )}
 
-      {/* What the new lyrics should say */}
+      {/* Step 3: what it should say */}
       {hasSelection && (
         <div>
-          <label className="block text-xs tracking-tight text-neutral-600 mb-1">
+          <label className="block text-xs tracking-tight text-muted mb-1">
             Should say
           </label>
-          <div className="text-xs text-neutral-700 mb-2 italic">
+          <div className="text-xs text-disabled mb-2 italic">
             Original: &ldquo;{originalLyrics}&rdquo;
           </div>
           <textarea
@@ -273,35 +298,39 @@ export default function MmuoFixPanel() {
             onChange={(e) => setPromptText(e.target.value)}
             placeholder="Write what the persona should sing instead…"
             rows={3}
-            className="w-full bg-black border border-neutral-900 text-white px-3 py-2 text-sm focus:outline-none focus:border-pink-700"
+            className="w-full bg-canvas border border-border-default text-primary px-3 py-2 text-sm focus:outline-none focus:border-accent"
           />
         </div>
       )}
 
       {/* Action */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={runFix}
-          disabled={working || !hasSelection || !promptText.trim() || !personaVoiceModel || !sourceTrackId}
-          className="px-6 py-2 border border-pink-700 text-pink-400 tracking-tight text-xs hover:bg-pink-900/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-        >
-          {working ? stage || 'Working…' : 'Fix lyric'}
-        </button>
-        {error && <div className="text-xs text-red-500">{error}</div>}
-        {stage && !error && <div className="text-xs text-neutral-600">{stage}</div>}
-      </div>
+      {words.length > 0 && (
+        <div className="flex items-center gap-4">
+          <button
+            onClick={runFix}
+            disabled={working || !hasSelection || !promptText.trim()}
+            className="px-6 py-2 border border-accent/60 text-accent tracking-tight text-sm hover:bg-accent-subtle disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            {working ? stage || 'Working…' : 'Fix lyric'}
+          </button>
+          {error && <div className="text-xs text-error">{error}</div>}
+          {stage && !error && <div className="text-xs text-muted">{stage}</div>}
+        </div>
+      )}
+
+      {error && !words.length && <div className="text-xs text-error">{error}</div>}
 
       {/* Result */}
       {result && audioUrl && (
-        <div className="border-t border-neutral-900 pt-6 space-y-3">
-          <div className="text-xs tracking-tight text-neutral-600">
-            Fixed {result.fixedPath ? '(full song, crossfaded)' : '(section only)'}
+        <div className="border-t border-border-default pt-6 space-y-3">
+          <div className="text-xs tracking-tight text-muted">
+            Fixed {result.fixedPath ? '— full song, crossfaded' : '— section only'}
           </div>
           {result.rawText && (
-            <div className="text-sm text-neutral-300 italic">
+            <div className="text-sm text-secondary italic">
               &ldquo;{result.rawText}&rdquo;
               {result.inSpec === false && (
-                <span className="ml-2 text-yellow-600 text-xs">meter drift</span>
+                <span className="ml-2 text-warning text-xs">(meter drift)</span>
               )}
             </div>
           )}
@@ -309,7 +338,7 @@ export default function MmuoFixPanel() {
           <a
             href={audioUrl}
             download
-            className="inline-block text-xs tracking-tight text-neutral-400 hover:text-pink-400 border-b border-neutral-900 hover:border-pink-700 pb-0.5 transition-colors"
+            className="inline-block text-xs tracking-tight text-secondary hover:text-accent border-b border-border-default hover:border-accent pb-0.5 transition-colors"
           >
             Download
           </a>

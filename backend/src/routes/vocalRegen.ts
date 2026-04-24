@@ -389,6 +389,73 @@ router.post('/fix-section', async (req: Request, res: Response) => {
   }
 });
 
+// POST /api/vocal-regen/suno-lookup ---------------------------------------
+// Resolve a Suno share URL (or raw song id) to the persona voice model +
+// source track id Mmuo needs. Lets the UI accept a single paste instead
+// of asking the user to track down persona/seed/trackId separately.
+//
+// Body: { url: string }
+// Returns: {
+//   trackId, personaId, seed, voiceModel, audioUrl, duration, tempo
+// }
+// voiceModel is pre-formatted "persona_id:<id>[|seed:<n>]" so the UI can
+// pass it through to /fix-section unchanged.
+router.post('/suno-lookup', async (req: Request, res: Response) => {
+  try {
+    const { url } = req.body as { url: string };
+    if (!url) return res.status(400).json({ error: 'url required' });
+    const info = await suno.resolveFromUrl(url);
+    if (!info) {
+      return res.status(404).json({
+        error: 'could not resolve Suno URL - check the link is public and SUNO_API_KEY is set',
+      });
+    }
+    const voiceModel = info.personaId
+      ? `persona_id:${info.personaId}${info.seed != null ? `|seed:${info.seed}` : ''}`
+      : null;
+    res.json({
+      trackId: info.trackId,
+      personaId: info.personaId,
+      seed: info.seed,
+      voiceModel,
+      audioUrl: info.audioUrl,
+      duration: info.duration,
+      tempo: info.tempo,
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'lookup failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// POST /api/vocal-regen/download-suno --------------------------------------
+// Download the Suno audio for a given URL or track id to /tmp so the
+// rest of the pipeline (transcribe + splice) can run against it without
+// the user having to upload the song. Returns the local path.
+router.post('/download-suno', async (req: Request, res: Response) => {
+  try {
+    const { url } = req.body as { url: string };
+    const info = await suno.resolveFromUrl(url || '');
+    if (!info || !info.audioUrl) {
+      return res.status(404).json({
+        error: 'could not resolve audio url from Suno link',
+      });
+    }
+    const resp = await fetch(info.audioUrl);
+    if (!resp.ok) {
+      return res.status(502).json({ error: `suno audio fetch ${resp.status}` });
+    }
+    const buf = Buffer.from(await resp.arrayBuffer());
+    const ext = info.audioUrl.split('?')[0].toLowerCase().endsWith('.wav') ? 'wav' : 'mp3';
+    const outPath = path.join('/tmp', `mmuo-suno-${info.trackId}-${Date.now()}.${ext}`);
+    fs.writeFileSync(outPath, buf);
+    res.json({ audioPath: outPath, trackId: info.trackId });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'download failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
 // POST /api/vocal-regen/transcribe ----------------------------------------
 // Word-level transcription of an uploaded file so the UI can render
 // clickable words to define the fix window. Lets the user pick "from
